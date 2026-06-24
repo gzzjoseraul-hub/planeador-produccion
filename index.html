@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Planeador PRO 1SDX</title>
 
-https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.jsscript>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
 :root{
@@ -29,9 +29,7 @@ https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.jsscript>
   --shadow:0 10px 25px rgba(15,23,42,.08);
 }
 
-*{
-  box-sizing:border-box;
-}
+*{ box-sizing:border-box; }
 
 body{
   margin:0;
@@ -57,9 +55,7 @@ body{
   opacity:.9;
 }
 
-.container{
-  padding:24px 32px 40px;
-}
+.container{ padding:24px 32px 40px; }
 
 .grid{
   display:grid;
@@ -117,34 +113,12 @@ button{
   transition:.15s ease;
 }
 
-button.primary{
-  background:var(--primary);
-  color:white;
-}
-
-button.primary:hover{
-  background:var(--primary-dark);
-}
-
-button.secondary{
-  background:#111827;
-  color:white;
-}
-
-button.light{
-  background:#e5e7eb;
-  color:#111827;
-}
-
-button.export{
-  background:#16a34a;
-  color:white;
-}
-
-button:disabled{
-  opacity:.5;
-  cursor:not-allowed;
-}
+button.primary{ background:var(--primary); color:white; }
+button.primary:hover{ background:var(--primary-dark); }
+button.secondary{ background:#111827; color:white; }
+button.light{ background:#e5e7eb; color:#111827; }
+button.export{ background:#16a34a; color:white; }
+button:disabled{ opacity:.5; cursor:not-allowed; }
 
 .status-bar{
   margin-top:16px;
@@ -188,6 +162,7 @@ button:disabled{
   display:flex;
   gap:10px;
   margin:22px 0 12px;
+  flex-wrap:wrap;
 }
 
 .tab-btn{
@@ -202,13 +177,8 @@ button:disabled{
   border-color:var(--primary);
 }
 
-.panel{
-  display:none;
-}
-
-.panel.active{
-  display:block;
-}
+.panel{ display:none; }
+.panel.active{ display:block; }
 
 .table-wrap{
   overflow:auto;
@@ -242,17 +212,9 @@ th,td{
   font-size:13px;
 }
 
-tr:hover{
-  background:#f9fafb;
-}
-
-.bad-row{
-  background:#fff7f7;
-}
-
-.ok-row{
-  background:#f7fff9;
-}
+tr:hover{ background:#f9fafb; }
+.bad-row{ background:#fff7f7; }
+.ok-row{ background:#f7fff9; }
 
 .badge{
   display:inline-block;
@@ -263,36 +225,18 @@ tr:hover{
   white-space:nowrap;
 }
 
-.badge-ok{
-  background:var(--green);
-  color:var(--green-text);
-}
-
-.badge-bad{
-  background:var(--red);
-  color:var(--red-text);
-}
-
-.badge-directo{
-  background:var(--blue-soft);
-  color:var(--blue-text);
-}
-
-.badge-directa{
-  background:var(--yellow);
-  color:var(--yellow-text);
-}
-
-.badge-ff{
-  background:var(--purple);
-  color:var(--purple-text);
-}
+.badge-ok{ background:var(--green); color:var(--green-text); }
+.badge-bad{ background:var(--red); color:var(--red-text); }
+.badge-directo{ background:var(--blue-soft); color:var(--blue-text); }
+.badge-directa{ background:var(--yellow); color:var(--yellow-text); }
+.badge-ff{ background:var(--purple); color:var(--purple-text); }
 
 .search-row{
   display:flex;
   gap:12px;
   margin-bottom:12px;
   align-items:center;
+  flex-wrap:wrap;
 }
 
 .search-row input{
@@ -302,10 +246,7 @@ tr:hover{
   padding:10px;
 }
 
-.small{
-  color:var(--muted);
-  font-size:12px;
-}
+.small{ color:var(--muted); font-size:12px; }
 
 .warning{
   margin-top:12px;
@@ -318,24 +259,14 @@ tr:hover{
 }
 
 @media(max-width:1100px){
-  .grid{
-    grid-template-columns:1fr;
-  }
-  .metrics{
-    grid-template-columns:repeat(2,1fr);
-  }
+  .grid{ grid-template-columns:1fr; }
+  .metrics{ grid-template-columns:repeat(2,1fr); }
 }
 
 @media(max-width:700px){
-  .container{
-    padding:16px;
-  }
-  .header{
-    padding:22px 18px;
-  }
-  .metrics{
-    grid-template-columns:1fr;
-  }
+  .container{ padding:16px; }
+  .header{ padding:22px 18px; }
+  .metrics{ grid-template-columns:1fr; }
 }
 </style>
 </head>
@@ -416,26 +347,11 @@ tr:hover{
   </div>
 
   <div class="metrics">
-    <div class="metric">
-      <div class="label">Órdenes totales</div>
-      <div class="value" id="mTotal">0</div>
-    </div>
-    <div class="metric">
-      <div class="label">Completas</div>
-      <div class="value" id="mOk">0</div>
-    </div>
-    <div class="metric">
-      <div class="label">No completas</div>
-      <div class="value" id="mBad">0</div>
-    </div>
-    <div class="metric">
-      <div class="label">Desv. directas</div>
-      <div class="value" id="mDirectas">0</div>
-    </div>
-    <div class="metric">
-      <div class="label">Desv. FF</div>
-      <div class="value" id="mFF">0</div>
-    </div>
+    <div class="metric"><div class="label">Órdenes totales</div><div class="value" id="mTotal">0</div></div>
+    <div class="metric"><div class="label">Completas</div><div class="value" id="mOk">0</div></div>
+    <div class="metric"><div class="label">No completas</div><div class="value" id="mBad">0</div></div>
+    <div class="metric"><div class="label">Desv. directas</div><div class="value" id="mDirectas">0</div></div>
+    <div class="metric"><div class="label">Desv. FF</div><div class="value" id="mFF">0</div></div>
   </div>
 
   <div class="tabs">
@@ -450,21 +366,15 @@ tr:hover{
       <input id="buscarOrden" placeholder="Buscar orden o material..." oninput="renderOrdenes()"/>
       <span class="small">Tip: busca por orden, material original o material usado.</span>
     </div>
-    <div class="table-wrap">
-      <table id="tablaOrdenes"></table>
-    </div>
+    <div class="table-wrap"><table id="tablaOrdenes"></table></div>
   </div>
 
   <div id="panelDesviaciones" class="panel">
-    <div class="table-wrap">
-      <table id="tablaDesviaciones"></table>
-    </div>
+    <div class="table-wrap"><table id="tablaDesviaciones"></table></div>
   </div>
 
   <div id="panelFaltantes" class="panel">
-    <div class="table-wrap">
-      <table id="tablaFaltantes"></table>
-    </div>
+    <div class="table-wrap"><table id="tablaFaltantes"></table></div>
   </div>
 
   <div id="panelInventario" class="panel">
@@ -472,9 +382,7 @@ tr:hover{
       <input id="buscarInv" placeholder="Buscar material..." oninput="renderInventarioFinal()"/>
       <span class="small">Muestra solo materiales involucrados en órdenes o desviaciones.</span>
     </div>
-    <div class="table-wrap">
-      <table id="tablaInventario"></table>
-    </div>
+    <div class="table-wrap"><table id="tablaInventario"></table></div>
   </div>
 
 </div>
@@ -489,11 +397,10 @@ let resultadosGlobal = [];
 let desviacionesGlobal = [];
 let faltantesGlobal = [];
 let inventarioFinalGlobal = {};
+let materialesOrdenBaseSet = new Set();
 let materialesUsadosSet = new Set();
 
-function setStatus(msg){
-  document.getElementById("status").innerHTML = msg;
-}
+function setStatus(msg){ document.getElementById("status").innerHTML = msg; }
 
 function normalizarMaterial(v){
   if(v === undefined || v === null) return "";
@@ -509,21 +416,21 @@ function num(v){
 }
 
 function getVal(row, posibles){
-  for(const p of posibles){
-    if(row[p] !== undefined) return row[p];
-  }
-
+  for(const p of posibles){ if(row[p] !== undefined) return row[p]; }
   const keys = Object.keys(row);
   for(const p of posibles){
     const found = keys.find(k => k.trim().toLowerCase() === p.trim().toLowerCase());
     if(found) return row[found];
   }
-
   return undefined;
 }
 
 async function leerExcel(file, opciones = {}){
   if(!file) throw new Error("Falta cargar un archivo.");
+
+  if(typeof XLSX === "undefined"){
+    throw new Error("No se cargó la librería XLSX. Revisa conexión a internet o si la red bloquea cdnjs.");
+  }
 
   return new Promise((resolve, reject)=>{
     const reader = new FileReader();
@@ -532,7 +439,6 @@ async function leerExcel(file, opciones = {}){
       try{
         const data = new Uint8Array(e.target.result);
         const wb = XLSX.read(data, {type:"array"});
-
         let sheetName = wb.SheetNames[0];
 
         if(opciones.sheetName){
@@ -546,10 +452,7 @@ async function leerExcel(file, opciones = {}){
             if(jsonTemp.length){
               const keys = Object.keys(jsonTemp[0]).map(k => k.trim().toLowerCase());
               const ok = opciones.requiredHeaders.every(h => keys.includes(h.trim().toLowerCase()));
-              if(ok){
-                sheetName = s;
-                break;
-              }
+              if(ok){ sheetName = s; break; }
             }
           }
         }
@@ -557,9 +460,7 @@ async function leerExcel(file, opciones = {}){
         const ws = wb.Sheets[sheetName];
         const json = XLSX.utils.sheet_to_json(ws, {defval:""});
         resolve(json);
-      }catch(err){
-        reject(err);
-      }
+      }catch(err){ reject(err); }
     };
 
     reader.onerror = reject;
@@ -569,17 +470,22 @@ async function leerExcel(file, opciones = {}){
 
 function validarArchivos(){
   const ids = ["pick","flor","stck","prog","alt","ff"];
+  const nombres = {
+    pick:"SOLO PICK",
+    flor:"FLOR",
+    stck:"STCK",
+    prog:"PROG",
+    alt:"BASE DE DATOS V2",
+    ff:"QR A FF"
+  };
   for(const id of ids){
-    if(!document.getElementById(id).files[0]){
-      throw new Error("Falta cargar el archivo: " + id.toUpperCase());
-    }
+    if(!document.getElementById(id).files[0]) throw new Error("Falta cargar el archivo: " + nombres[id]);
   }
 }
 
 async function cargarDatosYSimular(optimizar){
   try{
     validarArchivos();
-
     setStatus("⏳ Cargando archivos...");
 
     ordenes = {};
@@ -591,21 +497,15 @@ async function cargarDatosYSimular(optimizar){
     desviacionesGlobal = [];
     faltantesGlobal = [];
     inventarioFinalGlobal = {};
+    materialesOrdenBaseSet = new Set();
     materialesUsadosSet = new Set();
 
-    const pickFile = document.getElementById("pick").files[0];
-    const florFile = document.getElementById("flor").files[0];
-    const stckFile = document.getElementById("stck").files[0];
-    const progFile = document.getElementById("prog").files[0];
-    const altFile = document.getElementById("alt").files[0];
-    const ffFile = document.getElementById("ff").files[0];
-
-    const pick = await leerExcel(pickFile, {requiredHeaders:["Order","Material"]});
-    const flor = await leerExcel(florFile, {requiredHeaders:["Material","Unrestricted"]});
-    const stck = await leerExcel(stckFile, {requiredHeaders:["Material","Available stock"]});
-    const prog = await leerExcel(progFile, {requiredHeaders:["Material"]});
-    const alt = await leerExcel(altFile, {requiredHeaders:["Material","Descripcion"]});
-    const ff = await leerExcel(ffFile, {requiredHeaders:["QRCODE BREAKER","FF BREAKER"], sheetName:"ANALYSIS"});
+    const pick = await leerExcel(document.getElementById("pick").files[0], {requiredHeaders:["Order","Material"]});
+    const flor = await leerExcel(document.getElementById("flor").files[0], {requiredHeaders:["Material","Unrestricted"]});
+    const stck = await leerExcel(document.getElementById("stck").files[0], {requiredHeaders:["Material","Available stock"]});
+    const prog = await leerExcel(document.getElementById("prog").files[0], {requiredHeaders:["Material"]});
+    const alt = await leerExcel(document.getElementById("alt").files[0], {requiredHeaders:["Material","Descripcion"]});
+    const ff = await leerExcel(document.getElementById("ff").files[0], {requiredHeaders:["QRCODE BREAKER","FF BREAKER"], sheetName:"ANALYSIS"});
 
     setStatus("⏳ Procesando órdenes e inventarios...");
 
@@ -613,8 +513,6 @@ async function cargarDatosYSimular(optimizar){
     cargarInventario(flor, stck, prog);
     cargarBaseAlternativos(alt);
     cargarFF(ff);
-
-    inventarioTrabajo = clonar(inventarioInicial);
 
     let listaOrdenes = Object.keys(ordenes);
 
@@ -625,7 +523,6 @@ async function cargarDatosYSimular(optimizar){
 
     setStatus("⏳ Simulando consumo dinámico...");
     simular(listaOrdenes);
-
     setStatus(optimizar ? "✅ Optimización terminada." : "✅ Simulación terminada.");
 
   }catch(err){
@@ -638,35 +535,24 @@ function cargarOrdenes(rows){
   rows.forEach(r=>{
     const orden = normalizarMaterial(getVal(r, ["Order"]));
     const mat = normalizarMaterial(getVal(r, ["Material"]));
-    const qty = num(getVal(r, [
-      "Requirement Quantity",
-      "Requirement Quantity (EINHEIT)",
-      "Requirement quantity"
-    ]));
+    const qty = num(getVal(r, ["Requirement Quantity", "Requirement Quantity (EINHEIT)", "Requirement quantity"]));
 
     if(!orden || !mat || qty <= 0) return;
-
     if(!ordenes[orden]) ordenes[orden] = {};
     ordenes[orden][mat] = (ordenes[orden][mat] || 0) + qty;
+    materialesOrdenBaseSet.add(mat);
     materialesUsadosSet.add(mat);
   });
 }
 
 function initInv(mat){
-  if(!inventarioInicial[mat]){
-    inventarioInicial[mat] = {
-      flor:0,
-      stck:0,
-      prog:0
-    };
-  }
+  if(!inventarioInicial[mat]) inventarioInicial[mat] = {flor:0, stck:0, prog:0};
 }
 
 function cargarInventario(florRows, stckRows, progRows){
   florRows.forEach(r=>{
     const mat = normalizarMaterial(getVal(r, ["Material"]));
     if(!mat || mat.toLowerCase().includes("row labels")) return;
-
     initInv(mat);
     inventarioInicial[mat].flor += num(getVal(r, ["Unrestricted"]));
   });
@@ -674,7 +560,6 @@ function cargarInventario(florRows, stckRows, progRows){
   stckRows.forEach(r=>{
     const mat = normalizarMaterial(getVal(r, ["Material"]));
     if(!mat || mat.toLowerCase().includes("row labels")) return;
-
     initInv(mat);
     inventarioInicial[mat].stck += num(getVal(r, ["Available stock"]));
   });
@@ -701,7 +586,6 @@ function cargarBaseAlternativos(rows){
   rows.forEach(r=>{
     const mat = normalizarMaterial(getVal(r, ["Material"]));
     const altNum = normalizarMaterial(getVal(r, ["Descripcion", "Alternative Number", "Description"]));
-
     if(!mat || !mat.startsWith("1SDX") || !altNum) return;
     altMap[mat] = altNum;
   });
@@ -711,18 +595,14 @@ function cargarFF(rows){
   rows.forEach(r=>{
     const qr = normalizarMaterial(getVal(r, ["QRCODE BREAKER"]));
     const ff = normalizarMaterial(getVal(r, ["FF BREAKER"]));
-
     if(!qr || !ff) return;
     if(qr.toUpperCase().includes("NO QR")) return;
     if(ff.toUpperCase().includes("NO FF")) return;
-
     ffMap[qr] = ff;
   });
 }
 
-function clonar(obj){
-  return JSON.parse(JSON.stringify(obj));
-}
+function clonar(obj){ return JSON.parse(JSON.stringify(obj)); }
 
 function disponibleEn(inv, mat){
   const d = inv[mat];
@@ -731,28 +611,21 @@ function disponibleEn(inv, mat){
 }
 
 function consumirEn(inv, mat, qty){
-  if(!inv[mat]){
-    inv[mat] = {flor:0, stck:0, prog:0};
-  }
-
+  if(!inv[mat]) inv[mat] = {flor:0, stck:0, prog:0};
   let restante = qty;
 
-  const dispFlor = Math.max(0, inv[mat].flor);
-  const usoFlor = Math.min(dispFlor, restante);
+  const usoFlor = Math.min(Math.max(0, inv[mat].flor), restante);
   inv[mat].flor -= usoFlor;
   restante -= usoFlor;
 
-  const dispStck = Math.max(0, inv[mat].stck);
-  const usoStck = Math.min(dispStck, restante);
+  const usoStck = Math.min(Math.max(0, inv[mat].stck), restante);
   inv[mat].stck -= usoStck;
   restante -= usoStck;
 
   return qty - restante;
 }
 
-function es1SDX(mat){
-  return mat && mat.startsWith("1SDX");
-}
+function es1SDX(mat){ return mat && mat.startsWith("1SDX"); }
 
 function esDesviacionDirecta(original, candidato){
   if(original === candidato) return false;
@@ -760,15 +633,11 @@ function esDesviacionDirecta(original, candidato){
 
   const A = altMap[original];
   const B = altMap[candidato];
-
   if(!A || !B) return false;
   if(A.length < 15 || B.length < 15) return false;
 
-  const allowedDiff = new Set([3,14]);
-
-  if(A[2] === "2" || A[2] === "4"){
-    allowedDiff.add(9);
-  }
+  const allowedDiff = new Set([3,14]); // posiciones 4 y 15 en base 0
+  if(A[2] === "2" || A[2] === "4") allowedDiff.add(9); // posición 10
 
   for(let i=0; i<Math.max(A.length, B.length); i++){
     if(allowedDiff.has(i)) continue;
@@ -778,27 +647,18 @@ function esDesviacionDirecta(original, candidato){
   const jerarquia = ["B","C","D","N","S","H","L","V","X"];
   const posA = jerarquia.indexOf(A[3]);
   const posB = jerarquia.indexOf(B[3]);
-
   if(posA === -1 || posB === -1) return false;
   if(posB < posA) return false;
 
-  const d15A = A[14];
-  const d15B = B[14];
-
-  const regla15 = d15A === d15B ||
-                  (d15A === "0" && d15B === "G") ||
-                  (d15A === "G" && d15B === "0");
-
+  const regla15 = A[14] === B[14] ||
+                  (A[14] === "0" && B[14] === "G") ||
+                  (A[14] === "G" && B[14] === "0");
   if(!regla15) return false;
 
   if(A[2] === "2" || A[2] === "4"){
-    const d10A = A[9];
-    const d10B = B[9];
-
-    const regla10 = d10A === d10B ||
-                    (d10A === "1" && d10B === "F") ||
-                    (d10A === "F" && d10B === "1");
-
+    const regla10 = A[9] === B[9] ||
+                    (A[9] === "1" && B[9] === "F") ||
+                    (A[9] === "F" && B[9] === "1");
     if(!regla10) return false;
   }else{
     if(A[9] !== B[9]) return false;
@@ -813,30 +673,22 @@ function obtenerCandidatosDirectos(original, inv){
   Object.keys(inv).forEach(mat=>{
     if(mat === original) return;
     if(!es1SDX(mat)) return;
-
     const disp = disponibleEn(inv, mat);
     if(disp <= 0) return;
 
     if(esDesviacionDirecta(original, mat)){
-      candidatos.push({
-        material:mat,
-        tipo:"DIRECTA",
-        disponible:disp
-      });
+      candidatos.push({material:mat, tipo:"DIRECTA", disponible:disp});
     }
   });
 
   candidatos.sort((a,b)=>{
     const altA = altMap[a.material] || "";
     const altB = altMap[b.material] || "";
-    const jerarquia = ["B","C","D","N","S","H","L","V","X"];
-
     const originalAlt = altMap[original] || "";
+    const jerarquia = ["B","C","D","N","S","H","L","V","X"];
     const base = jerarquia.indexOf(originalAlt[3]);
-
     const da = Math.abs(jerarquia.indexOf(altA[3]) - base);
     const db = Math.abs(jerarquia.indexOf(altB[3]) - base);
-
     if(da !== db) return da - db;
     return b.disponible - a.disponible;
   });
@@ -847,15 +699,9 @@ function obtenerCandidatosDirectos(original, inv){
 function obtenerCandidatoFF(original, inv){
   const ff = ffMap[original];
   if(!ff) return null;
-
   const disp = disponibleEn(inv, ff);
   if(disp <= 0) return null;
-
-  return {
-    material:ff,
-    tipo:"FF",
-    disponible:disp
-  };
+  return {material:ff, tipo:"FF", disponible:disp};
 }
 
 function planearMaterial(invTemp, orden, original, req){
@@ -863,16 +709,9 @@ function planearMaterial(invTemp, orden, original, req){
   let faltante = req;
 
   const dispOriginal = disponibleEn(invTemp, original);
-
   if(dispOriginal > 0){
     const uso = Math.min(dispOriginal, faltante);
-    detalle.push({
-      orden,
-      material: original,
-      usado: original,
-      tipo: "DIRECTO",
-      cantidad: uso
-    });
+    detalle.push({orden, material:original, usado:original, tipo:"DIRECTO", cantidad:uso});
     consumirEn(invTemp, original, uso);
     faltante -= uso;
   }
@@ -886,15 +725,8 @@ function planearMaterial(invTemp, orden, original, req){
       if(faltante <= 0) break;
       const disp = disponibleEn(invTemp, c.material);
       if(disp <= 0) continue;
-
       const uso = Math.min(disp, faltante);
-      detalle.push({
-        orden,
-        material: original,
-        usado: c.material,
-        tipo: "DIRECTA",
-        cantidad: uso
-      });
+      detalle.push({orden, material:original, usado:c.material, tipo:"DIRECTA", cantidad:uso});
       consumirEn(invTemp, c.material, uso);
       faltante -= uso;
     }
@@ -904,32 +736,20 @@ function planearMaterial(invTemp, orden, original, req){
       if(ff){
         const disp = disponibleEn(invTemp, ff.material);
         const uso = Math.min(disp, faltante);
-
-        detalle.push({
-          orden,
-          material: original,
-          usado: ff.material,
-          tipo: "FF",
-          cantidad: uso
-        });
+        detalle.push({orden, material:original, usado:ff.material, tipo:"FF", cantidad:uso});
         consumirEn(invTemp, ff.material, uso);
         faltante -= uso;
       }
     }
   }
 
-  return {
-    ok: faltante <= 0,
-    detalle,
-    faltante
-  };
+  return {ok:faltante <= 0, detalle, faltante};
 }
 
 function intentarOrden(orden, invBase){
   const invTemp = clonar(invBase);
   const detalleOrden = [];
   const faltantes = [];
-
   const materiales = ordenes[orden] || {};
 
   for(const mat of Object.keys(materiales)){
@@ -939,30 +759,20 @@ function intentarOrden(orden, invBase){
     if(!plan.ok){
       faltantes.push({
         orden,
-        material: mat,
-        requerido: req,
-        disponibleInicial: disponibleEn(invBase, mat),
-        faltante: plan.faltante,
-        motivo: es1SDX(mat) ? "Sin inventario directo/alternativo suficiente" : "Sin inventario suficiente"
+        material:mat,
+        requerido:req,
+        disponibleInicial:disponibleEn(invBase, mat),
+        faltante:plan.faltante,
+        motivo:es1SDX(mat) ? "Sin inventario directo/alternativo suficiente" : "Sin inventario suficiente"
       });
 
-      return {
-        ok:false,
-        detalle:detalleOrden.concat(plan.detalle),
-        faltantes,
-        invResultante: invBase
-      };
+      return {ok:false, detalle:detalleOrden.concat(plan.detalle), faltantes, invResultante:invBase};
     }
 
     detalleOrden.push(...plan.detalle);
   }
 
-  return {
-    ok:true,
-    detalle:detalleOrden,
-    faltantes:[],
-    invResultante:invTemp
-  };
+  return {ok:true, detalle:detalleOrden, faltantes:[], invResultante:invTemp};
 }
 
 function simular(listaOrdenes){
@@ -970,7 +780,7 @@ function simular(listaOrdenes){
   resultadosGlobal = [];
   desviacionesGlobal = [];
   faltantesGlobal = [];
-  materialesUsadosSet = new Set(materialesUsadosSet);
+  materialesUsadosSet = new Set(materialesOrdenBaseSet);
 
   listaOrdenes.forEach(orden=>{
     const intento = intentarOrden(orden, inventarioTrabajo);
@@ -1007,7 +817,6 @@ function simular(listaOrdenes){
   });
 
   inventarioFinalGlobal = clonar(inventarioTrabajo);
-
   renderTodo();
 }
 
@@ -1017,7 +826,6 @@ function optimizarOrdenes(lista){
   const scored = lista.map(orden=>{
     const intento = intentarOrden(orden, invSnapshot);
     let score = 0;
-
     const materiales = ordenes[orden] || {};
     const totalItems = Object.keys(materiales).length;
     const totalQty = Object.values(materiales).reduce((a,b)=>a+b,0);
@@ -1026,14 +834,11 @@ function optimizarOrdenes(lista){
     score += totalItems * 50;
     score -= totalQty * 0.05;
 
-    const desvDirecta = intento.detalle.filter(d=>d.tipo==="DIRECTA").length;
-    const desvFF = intento.detalle.filter(d=>d.tipo==="FF").length;
-
+    const desvDirecta = intento.detalle.filter(d=>d.tipo === "DIRECTA").length;
+    const desvFF = intento.detalle.filter(d=>d.tipo === "FF").length;
     score -= desvDirecta * 30;
     score -= desvFF * 80;
-
-    const faltantes = intento.faltantes.length;
-    score -= faltantes * 500;
+    score -= intento.faltantes.length * 500;
 
     return {orden, score};
   });
@@ -1054,8 +859,8 @@ function actualizarMetricas(){
   const total = resultadosGlobal.length;
   const ok = resultadosGlobal.filter(r=>r.status).length;
   const bad = total - ok;
-  const directas = desviacionesGlobal.filter(d=>d.tipo==="DIRECTA").length;
-  const ff = desviacionesGlobal.filter(d=>d.tipo==="FF").length;
+  const directas = desviacionesGlobal.filter(d=>d.tipo === "DIRECTA").length;
+  const ff = desviacionesGlobal.filter(d=>d.tipo === "FF").length;
 
   document.getElementById("mTotal").innerText = total;
   document.getElementById("mOk").innerText = ok;
@@ -1073,21 +878,12 @@ function badge(tipo){
 
 function renderOrdenes(){
   const q = (document.getElementById("buscarOrden")?.value || "").toLowerCase();
-
-  let html = `
-    <tr>
-      <th>Secuencia</th>
-      <th>Orden</th>
-      <th>Status</th>
-      <th>Detalle de materiales</th>
-    </tr>
-  `;
+  let html = `<tr><th>Secuencia</th><th>Orden</th><th>Status</th><th>Detalle de materiales</th></tr>`;
 
   resultadosGlobal.forEach((r, idx)=>{
     const detalleTexto = r.detalle.map(d=>`${d.material} ${d.usado} ${d.tipo}`).join(" ").toLowerCase();
     const faltantesTexto = r.faltantes.map(f=>`${f.material}`).join(" ").toLowerCase();
     const searchText = `${r.orden} ${detalleTexto} ${faltantesTexto}`.toLowerCase();
-
     if(q && !searchText.includes(q)) return;
 
     let detalle = "";
@@ -1095,13 +891,7 @@ function renderOrdenes(){
     if(r.status){
       detalle = r.detalle.map(d=>{
         const flecha = d.material === d.usado ? "" : ` → <b>${d.usado}</b>`;
-        return `
-          <div>
-            <b>${d.material}</b>${flecha}
-            ${badge(d.tipo)}
-            <span class="small">Qty: ${d.cantidad}</span>
-          </div>
-        `;
+        return `<div><b>${d.material}</b>${flecha} ${badge(d.tipo)} <span class="small">Qty: ${d.cantidad}</span></div>`;
       }).join("");
     }else{
       detalle = r.faltantes.map(f=>`
@@ -1127,17 +917,7 @@ function renderOrdenes(){
 }
 
 function renderDesviaciones(){
-  let html = `
-    <tr>
-      <th>Orden</th>
-      <th>Material original</th>
-      <th>Material usado</th>
-      <th>Tipo</th>
-      <th>Cantidad</th>
-      <th>Alternative original</th>
-      <th>Alternative usado</th>
-    </tr>
-  `;
+  let html = `<tr><th>Orden</th><th>Material original</th><th>Material usado</th><th>Tipo</th><th>Cantidad</th><th>Alternative original</th><th>Alternative usado</th></tr>`;
 
   if(!desviacionesGlobal.length){
     html += `<tr><td colspan="7" class="small">No se aplicaron desviaciones 1SDX.</td></tr>`;
@@ -1161,16 +941,7 @@ function renderDesviaciones(){
 }
 
 function renderFaltantes(){
-  let html = `
-    <tr>
-      <th>Orden</th>
-      <th>Material</th>
-      <th>Requerido</th>
-      <th>Disponible directo</th>
-      <th>Faltante</th>
-      <th>Motivo</th>
-    </tr>
-  `;
+  let html = `<tr><th>Orden</th><th>Material</th><th>Requerido</th><th>Disponible directo</th><th>Faltante</th><th>Motivo</th></tr>`;
 
   if(!faltantesGlobal.length){
     html += `<tr><td colspan="6" class="small">No hay faltantes en las órdenes no completadas o todas completaron.</td></tr>`;
@@ -1194,34 +965,14 @@ function renderFaltantes(){
 
 function renderInventarioFinal(){
   const q = (document.getElementById("buscarInv")?.value || "").toLowerCase();
-
-  let html = `
-    <tr>
-      <th>Material</th>
-      <th>FLOR final</th>
-      <th>STCK final</th>
-      <th>PROG</th>
-      <th>Disponible final</th>
-    </tr>
-  `;
+  let html = `<tr><th>Material</th><th>FLOR final</th><th>STCK final</th><th>PROG</th><th>Disponible final</th></tr>`;
 
   const mats = Array.from(materialesUsadosSet).sort();
-
   mats.forEach(mat=>{
     if(q && !mat.toLowerCase().includes(q)) return;
-
-    const d = inventarioFinalGlobal[mat] || {flor:0,stck:0,prog:0};
+    const d = inventarioFinalGlobal[mat] || {flor:0, stck:0, prog:0};
     const disp = disponibleEn(inventarioFinalGlobal, mat);
-
-    html += `
-      <tr>
-        <td><b>${mat}</b></td>
-        <td>${num(d.flor)}</td>
-        <td>${num(d.stck)}</td>
-        <td>${num(d.prog)}</td>
-        <td><b>${disp}</b></td>
-      </tr>
-    `;
+    html += `<tr><td><b>${mat}</b></td><td>${num(d.flor)}</td><td>${num(d.stck)}</td><td>${num(d.prog)}</td><td><b>${disp}</b></td></tr>`;
   });
 
   document.getElementById("tablaInventario").innerHTML = html;
@@ -1230,7 +981,6 @@ function renderInventarioFinal(){
 function mostrarTab(tab, btn){
   document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
-
   document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
 
   if(tab === "ordenes") document.getElementById("panelOrdenes").classList.add("active");
@@ -1246,11 +996,11 @@ function exportarExcel(){
   }
 
   const resumen = resultadosGlobal.map((r, idx)=>({
-    Secuencia: idx + 1,
-    Orden: r.orden,
-    Status: r.status ? "Completa" : "No completa",
-    LineasMaterial: r.detalle.length,
-    Faltantes: r.faltantes.length
+    Secuencia:idx + 1,
+    Orden:r.orden,
+    Status:r.status ? "Completa" : "No completa",
+    LineasMaterial:r.detalle.length,
+    Faltantes:r.faltantes.length
   }));
 
   const detalle = [];
@@ -1259,72 +1009,70 @@ function exportarExcel(){
     if(r.status){
       r.detalle.forEach(d=>{
         detalle.push({
-          Secuencia: idx + 1,
-          Orden: r.orden,
-          Status: "Completa",
-          MaterialOriginal: d.material,
-          MaterialUsado: d.usado,
-          Tipo: d.tipo,
-          Cantidad: d.cantidad,
-          AlternativeOriginal: altMap[d.material] || "",
-          AlternativeUsado: altMap[d.usado] || ""
+          Secuencia:idx + 1,
+          Orden:r.orden,
+          Status:"Completa",
+          MaterialOriginal:d.material,
+          MaterialUsado:d.usado,
+          Tipo:d.tipo,
+          Cantidad:d.cantidad,
+          AlternativeOriginal:altMap[d.material] || "",
+          AlternativeUsado:altMap[d.usado] || ""
         });
       });
     }else{
       r.faltantes.forEach(f=>{
         detalle.push({
-          Secuencia: idx + 1,
-          Orden: r.orden,
-          Status: "No completa",
-          MaterialOriginal: f.material,
-          MaterialUsado: "",
-          Tipo: "FALTANTE",
-          Cantidad: f.requerido,
-          AlternativeOriginal: altMap[f.material] || "",
-          AlternativeUsado: ""
+          Secuencia:idx + 1,
+          Orden:r.orden,
+          Status:"No completa",
+          MaterialOriginal:f.material,
+          MaterialUsado:"",
+          Tipo:"FALTANTE",
+          Cantidad:f.requerido,
+          AlternativeOriginal:altMap[f.material] || "",
+          AlternativeUsado:""
         });
       });
     }
   });
 
   const desviaciones = desviacionesGlobal.map(d=>({
-    Orden: d.orden,
-    MaterialOriginal: d.materialOriginal,
-    MaterialUsado: d.materialUsado,
-    Tipo: d.tipo,
-    Cantidad: d.cantidad,
-    AlternativeOriginal: d.altOriginal,
-    AlternativeUsado: d.altUsado
+    Orden:d.orden,
+    MaterialOriginal:d.materialOriginal,
+    MaterialUsado:d.materialUsado,
+    Tipo:d.tipo,
+    Cantidad:d.cantidad,
+    AlternativeOriginal:d.altOriginal,
+    AlternativeUsado:d.altUsado
   }));
 
   const faltantes = faltantesGlobal.map(f=>({
-    Orden: f.orden,
-    Material: f.material,
-    Requerido: f.requerido,
-    DisponibleDirecto: f.disponibleInicial,
-    Faltante: f.faltante,
-    Motivo: f.motivo
+    Orden:f.orden,
+    Material:f.material,
+    Requerido:f.requerido,
+    DisponibleDirecto:f.disponibleInicial,
+    Faltante:f.faltante,
+    Motivo:f.motivo
   }));
 
   const inventario = Array.from(materialesUsadosSet).sort().map(mat=>{
-    const d = inventarioFinalGlobal[mat] || {flor:0,stck:0,prog:0};
+    const d = inventarioFinalGlobal[mat] || {flor:0, stck:0, prog:0};
     return {
-      Material: mat,
-      FLOR_Final: num(d.flor),
-      STCK_Final: num(d.stck),
-      PROG: num(d.prog),
-      Disponible_Final: disponibleEn(inventarioFinalGlobal, mat)
+      Material:mat,
+      FLOR_Final:num(d.flor),
+      STCK_Final:num(d.stck),
+      PROG:num(d.prog),
+      Disponible_Final:disponibleEn(inventarioFinalGlobal, mat)
     };
   });
 
   const wb = XLSX.utils.book_new();
-
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resumen), "Resumen");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(detalle), "Detalle");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(desviaciones), "Desviaciones");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(faltantes), "Faltantes");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(inventario), "Inventario Final");
-
   XLSX.writeFile(wb, "resultado_planeador_1SDX.xlsx");
 }
 
@@ -1345,7 +1093,6 @@ function limpiarResultados(){
   document.getElementById("tablaDesviaciones").innerHTML = "";
   document.getElementById("tablaFaltantes").innerHTML = "";
   document.getElementById("tablaInventario").innerHTML = "";
-
   setStatus("Resultados limpiados. Puedes cargar o correr de nuevo.");
 }
 </script>
