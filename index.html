@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Planeador de Producción PRO</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+body { font-family: Arial; margin: 20px; }
+h2 { color: #333; }
+button { padding:10px; margin:10px 5px; cursor:pointer; }
+table { border-collapse: collapse; width:100%; margin-top:15px; }
+th, td { border:1px solid #ddd; padding:6px; font-size:12px;}
+th { background:#f4f4f4; }
+
+.ok { background:#c8f7c5; }
+.bad { background:#f7c5c5; }
+.mid { background:#fff3b0; }
+</style>
+</head>
+
+<body>
+
+<h2>🧠 Planeador de Producción PRO</h2>
+
+<input type="file" id="pick" /> SOLO PICK<br>
+<input type="file" id="flor" /> FLOR<br>
+<input type="file" id="stck" /> STCK<br>
+<input type="file" id="prog" /> PROG<br><br>
+
+<button onclick="procesar()">📊 Simular</button>
+<button onclick="optimizar()">🚀 Optimizar Órdenes</button>
+
+<div id="resultado"></div>
+
+<script>
+
+let ordenes = {};
+let inventario = {};
+let resultadoGlobal = [];
+
+// ===== CARGAR EXCEL =====
+function leerExcel(file, callback) {
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        let data = new Uint8Array(e.target.result);
+        let workbook = XLSX.read(data, {type: 'array'});
+        let hoja = workbook.Sheets[workbook.SheetNames[0]];
+        let json = XLSX.utils.sheet_to_json(hoja);
+        callback(json);
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+// ===== PROCESO PRINCIPAL =====
+function procesar() {
+
+    ordenes = {};
+    inventario = {};
+
+    leerExcel(document.getElementById("pick").files[0], pick => {
+
+        // agrupar ordenes
+        pick.forEach(r => {
+            let o = r.Order;
+            let mat = r.Material;
+            let qty = Number(r["Requirement Quantity"] || 0);
+
+            if(!ordenes[o]) ordenes[o] = {};
+            ordenes[o][mat] = (ordenes[o][mat] || 0) + qty;
+        });
+
+        cargarInventarios();
+    });
+}
+
+// ===== INVENTARIO =====
+function cargarInventarios() {
+
+    leerExcel(document.getElementById("flor").files[0], flor => {
+
+        flor.forEach(r=>{
+            inventario[r.Material] = inventario[r.Material] || {flor:0,stck:0,prog:0};
+            inventario[r.Material].flor += Number(r["Unrestricted"] || 0);
+        });
+
+        leerExcel(document.getElementById("stck").files[0], stck => {
+
+            stck.forEach(r=>{
+                inventario[r.Material] = inventario[r.Material] || {flor:0,stck:0,prog:0};
+                inventario[r.Material].stck += Number(r["Available stock"] || 0);
+            });
+
+            leerExcel(document.getElementById("prog").files[0], prog => {
+
+                prog.forEach(r=>{
+                    inventario[r.Material] = inventario[r.Material] || {flor:0,stck:0,prog:0};
+                    inventario[r.Material].prog += Number(r.Qty || 0);
+                });
+
+                simular(Object.keys(ordenes));
+            });
+
+        });
+
+    });
+}
+
+// ===== DISPONIBLE =====
+function disponible(mat) {
+    let m = inventario[mat];
+    if(!m) return 0;
+    return m.flor + m.stck - m.prog;
+}
+
+// ===== CONSUMIR =====
+function consumir(mat, qty) {
+    let m = inventario[mat];
+    if(!m) return;
+
+    let total = m.flor + m.stck;
+    if(total < qty) return;
+
+    if(m.flor >= qty){
+        m.flor -= qty;
+    } else {
+        let resto = qty - m.flor;
+        m.flor = 0;
+        m.stck -= resto;
+    }
+}
+
+// ===== SIMULACIÓN =====
+function simular(listaOrdenes) {
+
+    let copiaInventario = JSON.parse(JSON.stringify(inventario));
+
+    let resultados = [];
+
+    listaOrdenes.forEach(ord => {
+
+        let puede = true;
+        let usaAlt = false;
+
+        for(let mat in ordenes[ord]){
+
+            let req = ordenes[ord][mat];
+
+            if(disponible(mat) < req){
+                puede = false;
+                break;
+            }
+        }
+
+        if(puede){
+            for(let mat in ordenes[ord]){
+                consumir(mat, ordenes[ord][mat]);
+            }
+        }
+
+        resultados.push({
+            orden: ord,
+            status: puede,
+            alternativo: usaAlt
+        });
+
+    });
+
+    resultadoGlobal = resultados;
+    render(resultados);
+
+}
+
+// ===== OPTIMIZACIÓN =====
+function optimizar() {
+
+    let lista = Object.keys(ordenes);
+
+    // scoring
+    let scores = lista.map(o=>{
+
+        let score = 0;
+
+        for(let mat in ordenes[o]){
+            let req = ordenes[o][mat];
+            let disp = disponible(mat);
+
+            if(disp >= req){
+                score += 100;
+            } else {
+                score -= 50;
+            }
+
+            if(mat.startsWith("1SDX")){
+                score -= 10; // penaliza alternativos
+            }
+        }
+
+        return {orden:o,score};
+    });
+
+    scores.sort((a,b)=>b.score-a.score);
+
+    let ordenOptimizado = scores.map(x=>x.orden);
+
+    // reset inventario real
+    inventario = JSON.parse(JSON.stringify(inventario));
+
+    simular(ordenOptimizado);
+}
+
+// ===== RENDER =====
+function render(data){
+
+    let html = "<table>";
+    html += "<tr><th>Orden</th><th>Status</th></tr>";
+
+    data.forEach(r=>{
+        html += `<tr class="${r.status ? 'ok':'bad'}">
+        <td>${r.orden}</td>
+        <td>${r.status ? '✅ Completa':'❌ No completa'}</td>
+        </tr>`;
+    });
+
+    html += "</table>";
+
+    document.getElementById("resultado").innerHTML = html;
+}
+
+</script>
+
+</body>
+</html>
