@@ -2,34 +2,33 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Planeador de Producción PRO</title>
+<title>Planeador PRO 1SDX</title>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
-body { font-family: Arial; margin: 20px; }
-h2 { color: #333; }
-button { padding:10px; margin:10px 5px; cursor:pointer; }
-table { border-collapse: collapse; width:100%; margin-top:15px; }
+body { font-family: Arial; margin:20px; }
+table { border-collapse: collapse; width:100%; margin-top:15px;}
 th, td { border:1px solid #ddd; padding:6px; font-size:12px;}
 th { background:#f4f4f4; }
-
 .ok { background:#c8f7c5; }
 .bad { background:#f7c5c5; }
-.mid { background:#fff3b0; }
 </style>
 </head>
 
 <body>
 
-<h2>🧠 Planeador de Producción PRO</h2>
+<h2>🧠 Planeador PRO 1SDX</h2>
 
-<input type="file" id="pick" /> SOLO PICK<br>
-<input type="file" id="flor" /> FLOR<br>
-<input type="file" id="stck" /> STCK<br>
-<input type="file" id="prog" /> PROG<br><br>
+<input type="file" id="pick"> SOLO PICK<br>
+<input type="file" id="flor"> FLOR<br>
+<input type="file" id="stck"> STCK<br>
+<input type="file" id="prog"> PROG<br>
+<input type="file" id="alt"> BASE 1SDX<br>
+<input type="file" id="ff"> QR → FF<br><br>
 
 <button onclick="procesar()">📊 Simular</button>
-<button onclick="optimizar()">🚀 Optimizar Órdenes</button>
+<button onclick="optimizar()">🚀 Optimizar</button>
 
 <div id="resultado"></div>
 
@@ -37,194 +36,257 @@ th { background:#f4f4f4; }
 
 let ordenes = {};
 let inventario = {};
-let resultadoGlobal = [];
+let altMap = {};
+let ffMap = {};
+let resultadosGlobal = [];
 
-// ===== CARGAR EXCEL =====
-function leerExcel(file, callback) {
-    let reader = new FileReader();
-    reader.onload = function(e) {
-        let data = new Uint8Array(e.target.result);
-        let workbook = XLSX.read(data, {type: 'array'});
-        let hoja = workbook.Sheets[workbook.SheetNames[0]];
-        let json = XLSX.utils.sheet_to_json(hoja);
-        callback(json);
-    };
-    reader.readAsArrayBuffer(file);
-}
-
-// ===== PROCESO PRINCIPAL =====
-function procesar() {
-
-    ordenes = {};
-    inventario = {};
-
-    leerExcel(document.getElementById("pick").files[0], pick => {
-
-        // agrupar ordenes
-        pick.forEach(r => {
-            let o = r.Order;
-            let mat = r.Material;
-            let qty = Number(r["Requirement Quantity"] || 0);
-
-            if(!ordenes[o]) ordenes[o] = {};
-            ordenes[o][mat] = (ordenes[o][mat] || 0) + qty;
-        });
-
-        cargarInventarios();
+// ===== FUNCIONES AUX =====
+function leerExcel(file){
+    return new Promise(res=>{
+        let reader = new FileReader();
+        reader.onload = e=>{
+            let data = new Uint8Array(e.target.result);
+            let wb = XLSX.read(data,{type:'array'});
+            let ws = wb.Sheets[wb.SheetNames[0]];
+            res(XLSX.utils.sheet_to_json(ws));
+        };
+        reader.readAsArrayBuffer(file);
     });
 }
 
-// ===== INVENTARIO =====
-function cargarInventarios() {
-
-    leerExcel(document.getElementById("flor").files[0], flor => {
-
-        flor.forEach(r=>{
-            inventario[r.Material] = inventario[r.Material] || {flor:0,stck:0,prog:0};
-            inventario[r.Material].flor += Number(r["Unrestricted"] || 0);
-        });
-
-        leerExcel(document.getElementById("stck").files[0], stck => {
-
-            stck.forEach(r=>{
-                inventario[r.Material] = inventario[r.Material] || {flor:0,stck:0,prog:0};
-                inventario[r.Material].stck += Number(r["Available stock"] || 0);
-            });
-
-            leerExcel(document.getElementById("prog").files[0], prog => {
-
-                prog.forEach(r=>{
-                    inventario[r.Material] = inventario[r.Material] || {flor:0,stck:0,prog:0};
-                    inventario[r.Material].prog += Number(r.Qty || 0);
-                });
-
-                simular(Object.keys(ordenes));
-            });
-
-        });
-
-    });
+function disponible(m){
+    let d = inventario[m];
+    if(!d) return 0;
+    return d.flor + d.stck - d.prog;
 }
 
-// ===== DISPONIBLE =====
-function disponible(mat) {
-    let m = inventario[mat];
-    if(!m) return 0;
-    return m.flor + m.stck - m.prog;
-}
+function consumir(m,qty){
+    let d = inventario[m];
+    if(!d) return;
 
-// ===== CONSUMIR =====
-function consumir(mat, qty) {
-    let m = inventario[mat];
-    if(!m) return;
-
-    let total = m.flor + m.stck;
-    if(total < qty) return;
-
-    if(m.flor >= qty){
-        m.flor -= qty;
-    } else {
-        let resto = qty - m.flor;
-        m.flor = 0;
-        m.stck -= resto;
+    if(d.flor>=qty){
+        d.flor-=qty;
+    }else{
+        let r=qty-d.flor;
+        d.flor=0;
+        d.stck-=r;
     }
 }
 
-// ===== SIMULACIÓN =====
-function simular(listaOrdenes) {
+// ===== REGLAS 1SDX =====
 
-    let copiaInventario = JSON.parse(JSON.stringify(inventario));
+function esDirecta(a,b){
 
-    let resultados = [];
+    let A = altMap[a];
+    let B = altMap[b];
 
-    listaOrdenes.forEach(ord => {
+    if(!A || !B) return false;
 
-        let puede = true;
-        let usaAlt = false;
+    let jerarquia = ["B","C","D","N","S","H","L","V","X"];
 
-        for(let mat in ordenes[ord]){
+    // regla 1 digito 4
+    let pA = jerarquia.indexOf(A[3]);
+    let pB = jerarquia.indexOf(B[3]);
+    if(pB < pA) return false;
 
-            let req = ordenes[ord][mat];
+    // regla 2 digito 15
+    if(!(A[14]===B[14] || (A[14]==="0" && B[14]==="G") || (A[14]==="G" && B[14]==="0")))
+        return false;
 
-            if(disponible(mat) < req){
-                puede = false;
+    // regla 3
+    if(A[2]==="2" || A[2]==="4"){
+        if(!(A[9]===B[9] || (A[9]==="1" && B[9]==="F") || (A[9]==="F" && B[9]==="1")))
+            return false;
+    }
+
+    return true;
+}
+
+function esFF(mat,alt){
+    return ffMap[mat] === alt;
+}
+
+// ===== PROCESO =====
+async function procesar(){
+
+    ordenes = {};
+    inventario = {};
+    altMap = {};
+    ffMap = {};
+
+    let pick = await leerExcel(document.getElementById("pick").files[0]);
+    let flor = await leerExcel(document.getElementById("flor").files[0]);
+    let stck = await leerExcel(document.getElementById("stck").files[0]);
+    let prog = await leerExcel(document.getElementById("prog").files[0]);
+    let alt = await leerExcel(document.getElementById("alt").files[0]);
+    let ff = await leerExcel(document.getElementById("ff").files[0]);
+
+    // ===== ORDENES =====
+    pick.forEach(r=>{
+        let o=r.Order, m=r.Material, q=Number(r["Requirement Quantity"]||0);
+        if(!ordenes[o]) ordenes[o]={};
+        ordenes[o][m]=(ordenes[o][m]||0)+q;
+    });
+
+    // ===== INVENTARIO =====
+    flor.forEach(r=>{
+        inventario[r.Material]=inventario[r.Material]||{flor:0,stck:0,prog:0};
+        inventario[r.Material].flor += Number(r["Unrestricted"]||0);
+    });
+
+    stck.forEach(r=>{
+        inventario[r.Material]=inventario[r.Material]||{flor:0,stck:0,prog:0};
+        inventario[r.Material].stck += Number(r["Available stock"]||0);
+    });
+
+    prog.forEach(r=>{
+        inventario[r.Material]=inventario[r.Material]||{flor:0,stck:0,prog:0};
+        inventario[r.Material].prog += Number(r.Qty||0);
+    });
+
+    // ===== ALT BASE =====
+    alt.forEach(r=>{
+        altMap[r.Material] = r.Descripcion;
+    });
+
+    // ===== FF =====
+    ff.forEach(r=>{
+        ffMap[r["QRCODE BREAKER"]] = r["FF BREAKER"];
+    });
+
+    simular(Object.keys(ordenes));
+}
+
+// ===== SIMULACION =====
+function simular(lista){
+
+    let resultados=[];
+
+    lista.forEach(o=>{
+
+        let puede=true;
+        let detalle=[];
+
+        for(let mat in ordenes[o]){
+            let req=ordenes[o][mat];
+
+            if(disponible(mat)>=req){
+                detalle.push({mat,usado:mat,tipo:"DIRECTO",qty:req});
+                continue;
+            }
+
+            let encontrado=null;
+
+            // DIRECTA
+            for(let alt in inventario){
+                if(alt!==mat && esDirecta(mat,alt) && disponible(alt)>=req){
+                    encontrado={usado:alt,tipo:"DIRECTA"};
+                    break;
+                }
+            }
+
+            // FF
+            if(!encontrado){
+                let altFF = ffMap[mat];
+                if(altFF && disponible(altFF)>=req){
+                    encontrado={usado:altFF,tipo:"FF"};
+                }
+            }
+
+            if(encontrado){
+                detalle.push({mat,usado:encontrado.usado,tipo:encontrado.tipo,qty:req});
+            }else{
+                puede=false;
                 break;
             }
         }
 
         if(puede){
-            for(let mat in ordenes[ord]){
-                consumir(mat, ordenes[ord][mat]);
-            }
+            detalle.forEach(d=>consumir(d.usado,d.qty));
         }
 
-        resultados.push({
-            orden: ord,
-            status: puede,
-            alternativo: usaAlt
-        });
-
+        resultados.push({orden:o,status:puede,detalle});
     });
 
-    resultadoGlobal = resultados;
+    resultadosGlobal=resultados;
     render(resultados);
-
 }
 
-// ===== OPTIMIZACIÓN =====
-function optimizar() {
+// ===== OPTIMIZAR =====
+function optimizar(){
 
-    let lista = Object.keys(ordenes);
+    let lista=Object.keys(ordenes);
 
-    // scoring
-    let scores = lista.map(o=>{
-
-        let score = 0;
-
-        for(let mat in ordenes[o]){
-            let req = ordenes[o][mat];
-            let disp = disponible(mat);
-
-            if(disp >= req){
-                score += 100;
-            } else {
-                score -= 50;
-            }
-
-            if(mat.startsWith("1SDX")){
-                score -= 10; // penaliza alternativos
-            }
-        }
-
-        return {orden:o,score};
+    lista.sort((a,b)=>{
+        let sa=score(a), sb=score(b);
+        return sb-sa;
     });
 
-    scores.sort((a,b)=>b.score-a.score);
+    simular(lista);
+}
 
-    let ordenOptimizado = scores.map(x=>x.orden);
+function score(o){
 
-    // reset inventario real
-    inventario = JSON.parse(JSON.stringify(inventario));
+    let s=0;
 
-    simular(ordenOptimizado);
+    for(let m in ordenes[o]){
+        let req=ordenes[o][m];
+
+        if(disponible(m)>=req) s+=100;
+        else s-=50;
+
+        if(m.startsWith("1SDX")) s-=5;
+    }
+
+    return s;
+}
+
+// ===== EXPORTAR =====
+function exportar(){
+
+    let data=[];
+
+    resultadosGlobal.forEach(o=>{
+        o.detalle.forEach(d=>{
+            data.push({
+                Orden:o.orden,
+                Status:o.status?"Completa":"No completa",
+                Material:d.mat,
+                Usado:d.usado,
+                Tipo:d.tipo,
+                Cantidad:d.qty
+            });
+        });
+    });
+
+    let ws=XLSX.utils.json_to_sheet(data);
+    let wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,"Resultado");
+    XLSX.writeFile(wb,"resultado_planeador.xlsx");
 }
 
 // ===== RENDER =====
 function render(data){
 
-    let html = "<table>";
-    html += "<tr><th>Orden</th><th>Status</th></tr>";
+    let html="<table>";
+    html+="<tr><th>Orden</th><th>Status</th><th>Detalle</th></tr>";
 
     data.forEach(r=>{
-        html += `<tr class="${r.status ? 'ok':'bad'}">
+        let det=r.detalle.map(d=>
+            `${d.mat} → ${d.usado} (${d.tipo})`
+        ).join("<br>");
+
+        html+=`<tr class="${r.status?'ok':'bad'}">
         <td>${r.orden}</td>
-        <td>${r.status ? '✅ Completa':'❌ No completa'}</td>
+        <td>${r.status?'✅':'❌'}</td>
+        <td>${det}</td>
         </tr>`;
     });
 
-    html += "</table>";
+    html+="</table>";
+    html+=`<button onclick="exportar()">📥 Exportar Excel</button>`;
 
-    document.getElementById("resultado").innerHTML = html;
+    document.getElementById("resultado").innerHTML=html;
 }
 
 </script>
