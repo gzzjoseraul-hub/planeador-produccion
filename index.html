@@ -26,6 +26,10 @@
   --blue-text:#1e40af;
   --purple:#ede9fe;
   --purple-text:#5b21b6;
+  --orange:#ffedd5;
+  --orange-text:#9a3412;
+  --gray:#f3f4f6;
+  --gray-text:#374151;
   --shadow:0 10px 25px rgba(15,23,42,.08);
 }
 
@@ -118,6 +122,7 @@ button.primary:hover{ background:var(--primary-dark); }
 button.secondary{ background:#111827; color:white; }
 button.light{ background:#e5e7eb; color:#111827; }
 button.export{ background:#16a34a; color:white; }
+button.warn{ background:#f97316; color:white; }
 button:disabled{ opacity:.5; cursor:not-allowed; }
 
 .status-bar{
@@ -131,7 +136,7 @@ button:disabled{ opacity:.5; cursor:not-allowed; }
 
 .metrics{
   display:grid;
-  grid-template-columns:repeat(5,1fr);
+  grid-template-columns:repeat(7,1fr);
   gap:14px;
   margin-top:18px;
 }
@@ -191,7 +196,7 @@ button:disabled{ opacity:.5; cursor:not-allowed; }
 table{
   width:100%;
   border-collapse:collapse;
-  min-width:1000px;
+  min-width:1050px;
 }
 
 th{
@@ -213,8 +218,9 @@ th,td{
 }
 
 tr:hover{ background:#f9fafb; }
-.bad-row{ background:#fff7f7; }
 .ok-row{ background:#f7fff9; }
+.bad-row{ background:#fff7f7; }
+.kanban-row{ background:#fffbeb; }
 
 .badge{
   display:inline-block;
@@ -223,6 +229,7 @@ tr:hover{ background:#f9fafb; }
   font-size:11px;
   font-weight:800;
   white-space:nowrap;
+  margin:1px 2px;
 }
 
 .badge-ok{ background:var(--green); color:var(--green-text); }
@@ -230,6 +237,9 @@ tr:hover{ background:#f9fafb; }
 .badge-directo{ background:var(--blue-soft); color:var(--blue-text); }
 .badge-directa{ background:var(--yellow); color:var(--yellow-text); }
 .badge-ff{ background:var(--purple); color:var(--purple-text); }
+.badge-kanban{ background:var(--orange); color:var(--orange-text); }
+.badge-bulk{ background:var(--gray); color:var(--gray-text); }
+.badge-mix{ background:#e0e7ff; color:#3730a3; }
 
 .search-row{
   display:flex;
@@ -258,7 +268,32 @@ tr:hover{ background:#f9fafb; }
   font-size:13px;
 }
 
-@media(max-width:1100px){
+.ok-note{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:12px;
+  background:#ecfdf5;
+  color:#166534;
+  border:1px solid #bbf7d0;
+  font-size:13px;
+}
+
+.fixed-status{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+  margin-top:10px;
+  font-size:12px;
+}
+.fixed-chip{
+  border:1px solid var(--border);
+  background:#f8fafc;
+  border-radius:10px;
+  padding:8px;
+  color:#334155;
+}
+
+@media(max-width:1200px){
   .grid{ grid-template-columns:1fr; }
   .metrics{ grid-template-columns:repeat(2,1fr); }
 }
@@ -275,7 +310,7 @@ tr:hover{ background:#f9fafb; }
 
 <div class="header">
   <h1>🧠 Planeador PRO 1SDX</h1>
-  <p>Simulación y optimización de órdenes con inventario FLOR + STCK - PROG, desviaciones DIRECTAS y FF.</p>
+  <p>Simulación y optimización con FLOR + STCK - PROG, desviaciones 1SDX, BULK y KANBAN.</p>
 </div>
 
 <div class="container">
@@ -306,7 +341,7 @@ tr:hover{ background:#f9fafb; }
     </div>
 
     <div class="card">
-      <h2>2. Bases fijas 1SDX</h2>
+      <h2>2. Bases fijas</h2>
 
       <div class="file-box">
         <label>BASE DE DATOS V2 / Material → Alternative Number</label>
@@ -318,30 +353,47 @@ tr:hover{ background:#f9fafb; }
         <input type="file" id="ff" accept=".xlsx,.xls,.csv"/>
       </div>
 
+      <div class="file-box">
+        <label>BULK / Materiales que no bloquean orden</label>
+        <input type="file" id="bulk" accept=".xlsx,.xls,.csv"/>
+      </div>
+
+      <div class="file-box">
+        <label>KANBAN / Materiales de llegada continua</label>
+        <input type="file" id="kanban" accept=".xlsx,.xls,.csv"/>
+      </div>
+
+      <div class="actions">
+        <button class="warn" onclick="guardarBasesFijas()">💾 Guardar / actualizar bases fijas</button>
+        <button class="light" onclick="borrarBasesFijas()">🗑️ Borrar bases fijas</button>
+      </div>
+
+      <div id="fixedStatus" class="fixed-status"></div>
+
       <div class="warning">
-        <b>Reglas aplicadas:</b><br>
-        1) Dígito 4: B → C → D → N → S → H → L → V → X<br>
-        2) Dígito 15: 0 ↔ G<br>
-        3) Si dígito 3 es 2 o 4, dígito 10 puede 1 ↔ F<br>
-        4) FF solo si existe en tabla QR → FF
+        <b>Nota:</b> BASE 1SDX, QR→FF, BULK y KANBAN se guardan en este navegador con localStorage. Solo necesitas cargarlas cuando cambien.
       </div>
     </div>
 
     <div class="card">
       <h2>3. Ejecutar</h2>
       <p class="small">
-        Primero carga todos los archivos. Luego puedes simular el orden original o ejecutar optimización.
+        Carga SOLO PICK, FLOR, STCK y PROG cada corrida. Las bases fijas pueden estar guardadas previamente.
       </p>
 
       <div class="actions">
         <button class="primary" onclick="cargarDatosYSimular(false)">📊 Simular</button>
         <button class="secondary" onclick="cargarDatosYSimular(true)">🚀 Optimizar órdenes</button>
         <button class="export" onclick="exportarExcel()">📥 Exportar Excel</button>
-        <button class="light" onclick="limpiarResultados()">🧹 Limpiar</button>
+        <button class="light" onclick="limpiarResultados()">🧹 Limpiar resultados</button>
       </div>
 
-      <div id="status" class="status-bar">
-        Esperando archivos...
+      <div id="status" class="status-bar">Esperando archivos...</div>
+
+      <div class="ok-note">
+        <b>Status nuevos:</b><br>
+        <span class="badge badge-bulk">BULK IGNORADO</span> No bloquea la orden aunque falte.<br>
+        <span class="badge badge-kanban">COMPLETA SI LLEGA KANBAN</span> Solo faltan materiales KANBAN; no se descuenta inventario hasta que llegue.
       </div>
     </div>
   </div>
@@ -349,63 +401,72 @@ tr:hover{ background:#f9fafb; }
   <div class="metrics">
     <div class="metric"><div class="label">Órdenes totales</div><div class="value" id="mTotal">0</div></div>
     <div class="metric"><div class="label">Completas</div><div class="value" id="mOk">0</div></div>
+    <div class="metric"><div class="label">Completa si llega kanban</div><div class="value" id="mKanban">0</div></div>
     <div class="metric"><div class="label">No completas</div><div class="value" id="mBad">0</div></div>
     <div class="metric"><div class="label">Desv. directas</div><div class="value" id="mDirectas">0</div></div>
     <div class="metric"><div class="label">Desv. FF</div><div class="value" id="mFF">0</div></div>
+    <div class="metric"><div class="label">Bulks ignorados</div><div class="value" id="mBulk">0</div></div>
   </div>
 
   <div class="tabs">
     <button class="tab-btn active" onclick="mostrarTab('ordenes', this)">Órdenes</button>
     <button class="tab-btn" onclick="mostrarTab('desviaciones', this)">Desviaciones 1SDX</button>
-    <button class="tab-btn" onclick="mostrarTab('faltantes', this)">Faltantes</button>
+    <button class="tab-btn" onclick="mostrarTab('kanban', this)">Faltantes KANBAN</button>
+    <button class="tab-btn" onclick="mostrarTab('bulk', this)">BULK ignorados</button>
+    <button class="tab-btn" onclick="mostrarTab('faltantes', this)">Faltantes reales</button>
     <button class="tab-btn" onclick="mostrarTab('inventario', this)">Inventario final</button>
   </div>
 
   <div id="panelOrdenes" class="panel active">
     <div class="search-row">
       <input id="buscarOrden" placeholder="Buscar orden o material..." oninput="renderOrdenes()"/>
-      <span class="small">Tip: busca por orden, material original o material usado.</span>
+      <span class="small">Tip: busca por orden, material original, material usado o tipo de desviación.</span>
     </div>
     <div class="table-wrap"><table id="tablaOrdenes"></table></div>
   </div>
 
-  <div id="panelDesviaciones" class="panel">
-    <div class="table-wrap"><table id="tablaDesviaciones"></table></div>
-  </div>
-
-  <div id="panelFaltantes" class="panel">
-    <div class="table-wrap"><table id="tablaFaltantes"></table></div>
-  </div>
+  <div id="panelDesviaciones" class="panel"><div class="table-wrap"><table id="tablaDesviaciones"></table></div></div>
+  <div id="panelKanban" class="panel"><div class="table-wrap"><table id="tablaKanban"></table></div></div>
+  <div id="panelBulk" class="panel"><div class="table-wrap"><table id="tablaBulk"></table></div></div>
+  <div id="panelFaltantes" class="panel"><div class="table-wrap"><table id="tablaFaltantes"></table></div></div>
 
   <div id="panelInventario" class="panel">
     <div class="search-row">
       <input id="buscarInv" placeholder="Buscar material..." oninput="renderInventarioFinal()"/>
-      <span class="small">Muestra solo materiales involucrados en órdenes o desviaciones.</span>
+      <span class="small">Muestra materiales involucrados en órdenes, desviaciones, bulk o kanban.</span>
     </div>
     <div class="table-wrap"><table id="tablaInventario"></table></div>
   </div>
-
 </div>
 
 <script>
+const LS_ALT = "planner_altMap_v2";
+const LS_FF = "planner_ffMap_v2";
+const LS_BULK = "planner_bulkSet_v1";
+const LS_KANBAN = "planner_kanbanSet_v1";
+
 let ordenes = {};
 let inventarioInicial = {};
 let inventarioTrabajo = {};
 let altMap = {};
 let ffMap = {};
+let bulkSet = new Set();
+let kanbanSet = new Set();
+
 let resultadosGlobal = [];
 let desviacionesGlobal = [];
+let kanbanGlobal = [];
+let bulkGlobal = [];
 let faltantesGlobal = [];
 let inventarioFinalGlobal = {};
 let materialesOrdenBaseSet = new Set();
 let materialesUsadosSet = new Set();
 
 function setStatus(msg){ document.getElementById("status").innerHTML = msg; }
-
-function normalizarMaterial(v){
-  if(v === undefined || v === null) return "";
-  return String(v).trim();
-}
+function normalizarMaterial(v){ if(v === undefined || v === null) return ""; return String(v).trim(); }
+function normalizarKey(v){ return normalizarMaterial(v).toUpperCase(); }
+function esBulk(mat){ return bulkSet.has(normalizarKey(mat)); }
+function esKanban(mat){ return kanbanSet.has(normalizarKey(mat)); }
 
 function num(v){
   if(v === undefined || v === null || v === "") return 0;
@@ -425,16 +486,21 @@ function getVal(row, posibles){
   return undefined;
 }
 
+function firstValue(row){
+  const keys = Object.keys(row || {});
+  for(const k of keys){
+    const v = normalizarMaterial(row[k]);
+    if(v) return v;
+  }
+  return "";
+}
+
 async function leerExcel(file, opciones = {}){
   if(!file) throw new Error("Falta cargar un archivo.");
-
-  if(typeof XLSX === "undefined"){
-    throw new Error("No se cargó la librería XLSX. Revisa conexión a internet o si la red bloquea cdnjs.");
-  }
+  if(typeof XLSX === "undefined") throw new Error("No se cargó la librería XLSX. Revisa conexión a internet o si la red bloquea cdnjs.");
 
   return new Promise((resolve, reject)=>{
     const reader = new FileReader();
-
     reader.onload = e=>{
       try{
         const data = new Uint8Array(e.target.result);
@@ -462,39 +528,142 @@ async function leerExcel(file, opciones = {}){
         resolve(json);
       }catch(err){ reject(err); }
     };
-
     reader.onerror = reject;
     reader.readAsArrayBuffer(file);
   });
 }
 
-function validarArchivos(){
-  const ids = ["pick","flor","stck","prog","alt","ff"];
-  const nombres = {
-    pick:"SOLO PICK",
-    flor:"FLOR",
-    stck:"STCK",
-    prog:"PROG",
-    alt:"BASE DE DATOS V2",
-    ff:"QR A FF"
-  };
+function loadJSON(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    if(!raw) return fallback;
+    return JSON.parse(raw);
+  }catch(e){ return fallback; }
+}
+
+function saveJSON(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+
+function cargarBasesDesdeStorage(){
+  altMap = loadJSON(LS_ALT, {});
+  ffMap = loadJSON(LS_FF, {});
+  bulkSet = new Set(loadJSON(LS_BULK, []));
+  kanbanSet = new Set(loadJSON(LS_KANBAN, []));
+  renderFixedStatus();
+}
+
+function renderFixedStatus(){
+  const el = document.getElementById("fixedStatus");
+  if(!el) return;
+  el.innerHTML = `
+    <div class="fixed-chip"><b>BASE 1SDX:</b> ${Object.keys(altMap).length} materiales</div>
+    <div class="fixed-chip"><b>QR→FF:</b> ${Object.keys(ffMap).length} relaciones</div>
+    <div class="fixed-chip"><b>BULK:</b> ${bulkSet.size} materiales</div>
+    <div class="fixed-chip"><b>KANBAN:</b> ${kanbanSet.size} materiales</div>
+  `;
+}
+
+async function guardarBasesFijas(){
+  try{
+    setStatus("⏳ Guardando bases fijas...");
+
+    const altFile = document.getElementById("alt").files[0];
+    const ffFile = document.getElementById("ff").files[0];
+    const bulkFile = document.getElementById("bulk").files[0];
+    const kanbanFile = document.getElementById("kanban").files[0];
+
+    if(altFile){
+      const altRows = await leerExcel(altFile, {requiredHeaders:["Material","Descripcion"]});
+      const newAlt = {};
+      altRows.forEach(r=>{
+        const mat = normalizarMaterial(getVal(r, ["Material"]));
+        const altNum = normalizarMaterial(getVal(r, ["Descripcion", "Alternative Number", "Description"]));
+        if(mat && mat.startsWith("1SDX") && altNum) newAlt[mat] = altNum;
+      });
+      altMap = newAlt;
+      saveJSON(LS_ALT, altMap);
+    }
+
+    if(ffFile){
+      const ffRows = await leerExcel(ffFile, {requiredHeaders:["QRCODE BREAKER","FF BREAKER"], sheetName:"ANALYSIS"});
+      const newFF = {};
+      ffRows.forEach(r=>{
+        const qr = normalizarMaterial(getVal(r, ["QRCODE BREAKER"]));
+        const ff = normalizarMaterial(getVal(r, ["FF BREAKER"]));
+        if(!qr || !ff) return;
+        if(qr.toUpperCase().includes("NO QR")) return;
+        if(ff.toUpperCase().includes("NO FF")) return;
+        newFF[qr] = ff;
+      });
+      ffMap = newFF;
+      saveJSON(LS_FF, ffMap);
+    }
+
+    if(bulkFile){
+      const bulkRows = await leerExcel(bulkFile, {});
+      const arr = [];
+      bulkRows.forEach(r=>{
+        const mat = normalizarMaterial(getVal(r, ["Material", "NUMERO DE PARTE", "Part Number", "Parte"])) || firstValue(r);
+        if(mat && !mat.toLowerCase().includes("row labels")) arr.push(normalizarKey(mat));
+      });
+      bulkSet = new Set(arr);
+      saveJSON(LS_BULK, Array.from(bulkSet));
+    }
+
+    if(kanbanFile){
+      const kanbanRows = await leerExcel(kanbanFile, {});
+      const arr = [];
+      kanbanRows.forEach(r=>{
+        const mat = normalizarMaterial(getVal(r, ["NUMERO DE PARTE", "Material", "Part Number", "Parte"])) || firstValue(r);
+        if(mat && !mat.toLowerCase().includes("row labels")) arr.push(normalizarKey(mat));
+      });
+      kanbanSet = new Set(arr);
+      saveJSON(LS_KANBAN, Array.from(kanbanSet));
+    }
+
+    cargarBasesDesdeStorage();
+    setStatus("✅ Bases fijas guardadas/actualizadas correctamente.");
+  }catch(err){
+    console.error(err);
+    setStatus("❌ Error guardando bases fijas: " + err.message);
+  }
+}
+
+function borrarBasesFijas(){
+  if(!confirm("¿Seguro que quieres borrar BASE 1SDX, QR→FF, BULK y KANBAN guardados en este navegador?")) return;
+  localStorage.removeItem(LS_ALT);
+  localStorage.removeItem(LS_FF);
+  localStorage.removeItem(LS_BULK);
+  localStorage.removeItem(LS_KANBAN);
+  cargarBasesDesdeStorage();
+  setStatus("🗑️ Bases fijas borradas.");
+}
+
+function validarArchivosOperacion(){
+  const ids = ["pick","flor","stck","prog"];
+  const nombres = {pick:"SOLO PICK", flor:"FLOR", stck:"STCK", prog:"PROG"};
   for(const id of ids){
     if(!document.getElementById(id).files[0]) throw new Error("Falta cargar el archivo: " + nombres[id]);
   }
+
+  if(Object.keys(altMap).length === 0) throw new Error("Falta BASE 1SDX. Súbela y presiona 'Guardar / actualizar bases fijas'.");
+  if(Object.keys(ffMap).length === 0) throw new Error("Falta QR→FF. Súbela y presiona 'Guardar / actualizar bases fijas'.");
+  if(bulkSet.size === 0) throw new Error("Falta BULK. Súbelo y presiona 'Guardar / actualizar bases fijas'.");
+  if(kanbanSet.size === 0) throw new Error("Falta KANBAN. Súbelo y presiona 'Guardar / actualizar bases fijas'.");
 }
 
 async function cargarDatosYSimular(optimizar){
   try{
-    validarArchivos();
-    setStatus("⏳ Cargando archivos...");
+    cargarBasesDesdeStorage();
+    validarArchivosOperacion();
+    setStatus("⏳ Cargando archivos de corrida...");
 
     ordenes = {};
     inventarioInicial = {};
     inventarioTrabajo = {};
-    altMap = {};
-    ffMap = {};
     resultadosGlobal = [];
     desviacionesGlobal = [];
+    kanbanGlobal = [];
+    bulkGlobal = [];
     faltantesGlobal = [];
     inventarioFinalGlobal = {};
     materialesOrdenBaseSet = new Set();
@@ -504,18 +673,12 @@ async function cargarDatosYSimular(optimizar){
     const flor = await leerExcel(document.getElementById("flor").files[0], {requiredHeaders:["Material","Unrestricted"]});
     const stck = await leerExcel(document.getElementById("stck").files[0], {requiredHeaders:["Material","Available stock"]});
     const prog = await leerExcel(document.getElementById("prog").files[0], {requiredHeaders:["Material"]});
-    const alt = await leerExcel(document.getElementById("alt").files[0], {requiredHeaders:["Material","Descripcion"]});
-    const ff = await leerExcel(document.getElementById("ff").files[0], {requiredHeaders:["QRCODE BREAKER","FF BREAKER"], sheetName:"ANALYSIS"});
 
     setStatus("⏳ Procesando órdenes e inventarios...");
-
     cargarOrdenes(pick);
     cargarInventario(flor, stck, prog);
-    cargarBaseAlternativos(alt);
-    cargarFF(ff);
 
     let listaOrdenes = Object.keys(ordenes);
-
     if(optimizar){
       setStatus("🚀 Optimizando órdenes...");
       listaOrdenes = optimizarOrdenes(listaOrdenes);
@@ -524,7 +687,6 @@ async function cargarDatosYSimular(optimizar){
     setStatus("⏳ Simulando consumo dinámico...");
     simular(listaOrdenes);
     setStatus(optimizar ? "✅ Optimización terminada." : "✅ Simulación terminada.");
-
   }catch(err){
     console.error(err);
     setStatus("❌ Error: " + err.message);
@@ -536,7 +698,6 @@ function cargarOrdenes(rows){
     const orden = normalizarMaterial(getVal(r, ["Order"]));
     const mat = normalizarMaterial(getVal(r, ["Material"]));
     const qty = num(getVal(r, ["Requirement Quantity", "Requirement Quantity (EINHEIT)", "Requirement quantity"]));
-
     if(!orden || !mat || qty <= 0) return;
     if(!ordenes[orden]) ordenes[orden] = {};
     ordenes[orden][mat] = (ordenes[orden][mat] || 0) + qty;
@@ -545,9 +706,7 @@ function cargarOrdenes(rows){
   });
 }
 
-function initInv(mat){
-  if(!inventarioInicial[mat]) inventarioInicial[mat] = {flor:0, stck:0, prog:0};
-}
+function initInv(mat){ if(!inventarioInicial[mat]) inventarioInicial[mat] = {flor:0, stck:0, prog:0}; }
 
 function cargarInventario(florRows, stckRows, progRows){
   florRows.forEach(r=>{
@@ -567,38 +726,9 @@ function cargarInventario(florRows, stckRows, progRows){
   progRows.forEach(r=>{
     const mat = normalizarMaterial(getVal(r, ["Material"]));
     if(!mat || mat.toLowerCase().includes("row labels")) return;
-
-    const pendiente = num(getVal(r, [
-      "Pendiente de consumo o pickeo",
-      "Pending",
-      "Qty",
-      "Quantity",
-      "Requirement Quantity",
-      "Requirement Quantity (EINHEIT)"
-    ]));
-
+    const pendiente = num(getVal(r, ["Pendiente de consumo o pickeo", "Pending", "Qty", "Quantity", "Requirement Quantity", "Requirement Quantity (EINHEIT)"]));
     initInv(mat);
     inventarioInicial[mat].prog += pendiente;
-  });
-}
-
-function cargarBaseAlternativos(rows){
-  rows.forEach(r=>{
-    const mat = normalizarMaterial(getVal(r, ["Material"]));
-    const altNum = normalizarMaterial(getVal(r, ["Descripcion", "Alternative Number", "Description"]));
-    if(!mat || !mat.startsWith("1SDX") || !altNum) return;
-    altMap[mat] = altNum;
-  });
-}
-
-function cargarFF(rows){
-  rows.forEach(r=>{
-    const qr = normalizarMaterial(getVal(r, ["QRCODE BREAKER"]));
-    const ff = normalizarMaterial(getVal(r, ["FF BREAKER"]));
-    if(!qr || !ff) return;
-    if(qr.toUpperCase().includes("NO QR")) return;
-    if(ff.toUpperCase().includes("NO FF")) return;
-    ffMap[qr] = ff;
   });
 }
 
@@ -613,15 +743,12 @@ function disponibleEn(inv, mat){
 function consumirEn(inv, mat, qty){
   if(!inv[mat]) inv[mat] = {flor:0, stck:0, prog:0};
   let restante = qty;
-
   const usoFlor = Math.min(Math.max(0, inv[mat].flor), restante);
   inv[mat].flor -= usoFlor;
   restante -= usoFlor;
-
   const usoStck = Math.min(Math.max(0, inv[mat].stck), restante);
   inv[mat].stck -= usoStck;
   restante -= usoStck;
-
   return qty - restante;
 }
 
@@ -630,14 +757,13 @@ function es1SDX(mat){ return mat && mat.startsWith("1SDX"); }
 function esDesviacionDirecta(original, candidato){
   if(original === candidato) return false;
   if(!es1SDX(original) || !es1SDX(candidato)) return false;
-
   const A = altMap[original];
   const B = altMap[candidato];
   if(!A || !B) return false;
   if(A.length < 15 || B.length < 15) return false;
 
-  const allowedDiff = new Set([3,14]); // posiciones 4 y 15 en base 0
-  if(A[2] === "2" || A[2] === "4") allowedDiff.add(9); // posición 10
+  const allowedDiff = new Set([3,14]);
+  if(A[2] === "2" || A[2] === "4") allowedDiff.add(9);
 
   for(let i=0; i<Math.max(A.length, B.length); i++){
     if(allowedDiff.has(i)) continue;
@@ -650,35 +776,26 @@ function esDesviacionDirecta(original, candidato){
   if(posA === -1 || posB === -1) return false;
   if(posB < posA) return false;
 
-  const regla15 = A[14] === B[14] ||
-                  (A[14] === "0" && B[14] === "G") ||
-                  (A[14] === "G" && B[14] === "0");
+  const regla15 = A[14] === B[14] || (A[14] === "0" && B[14] === "G") || (A[14] === "G" && B[14] === "0");
   if(!regla15) return false;
 
   if(A[2] === "2" || A[2] === "4"){
-    const regla10 = A[9] === B[9] ||
-                    (A[9] === "1" && B[9] === "F") ||
-                    (A[9] === "F" && B[9] === "1");
+    const regla10 = A[9] === B[9] || (A[9] === "1" && B[9] === "F") || (A[9] === "F" && B[9] === "1");
     if(!regla10) return false;
   }else{
     if(A[9] !== B[9]) return false;
   }
-
   return true;
 }
 
 function obtenerCandidatosDirectos(original, inv){
   const candidatos = [];
-
   Object.keys(inv).forEach(mat=>{
     if(mat === original) return;
     if(!es1SDX(mat)) return;
     const disp = disponibleEn(inv, mat);
     if(disp <= 0) return;
-
-    if(esDesviacionDirecta(original, mat)){
-      candidatos.push({material:mat, tipo:"DIRECTA", disponible:disp});
-    }
+    if(esDesviacionDirecta(original, mat)) candidatos.push({material:mat, tipo:"DIRECTA", disponible:disp});
   });
 
   candidatos.sort((a,b)=>{
@@ -692,7 +809,6 @@ function obtenerCandidatosDirectos(original, inv){
     if(da !== db) return da - db;
     return b.disponible - a.disponible;
   });
-
   return candidatos;
 }
 
@@ -706,7 +822,26 @@ function obtenerCandidatoFF(original, inv){
 
 function planearMaterial(invTemp, orden, original, req){
   const detalle = [];
+  const faltantes = [];
+  const bulkIgnorados = [];
   let faltante = req;
+
+  // BULK: no bloquea la orden. Se consume lo que exista y se ignora el resto.
+  if(esBulk(original)){
+    const disp = disponibleEn(invTemp, original);
+    if(disp > 0){
+      const uso = Math.min(disp, faltante);
+      detalle.push({orden, material:original, usado:original, tipo:"DIRECTO", cantidad:uso});
+      consumirEn(invTemp, original, uso);
+      faltante -= uso;
+    }
+    if(faltante > 0){
+      const b = {orden, material:original, requerido:req, faltante:faltante, tipo:"BULK"};
+      bulkIgnorados.push(b);
+      detalle.push({orden, material:original, usado:"BULK IGNORADO", tipo:"BULK", cantidad:faltante});
+    }
+    return {ok:true, detalle, faltantes, bulkIgnorados, faltante:0};
+  }
 
   const dispOriginal = disponibleEn(invTemp, original);
   if(dispOriginal > 0){
@@ -716,11 +851,10 @@ function planearMaterial(invTemp, orden, original, req){
     faltante -= uso;
   }
 
-  if(faltante <= 0) return {ok:true, detalle, faltante:0};
+  if(faltante <= 0) return {ok:true, detalle, faltantes, bulkIgnorados, faltante:0};
 
   if(es1SDX(original)){
     const candidatosDirectos = obtenerCandidatosDirectos(original, invTemp);
-
     for(const c of candidatosDirectos){
       if(faltante <= 0) break;
       const disp = disponibleEn(invTemp, c.material);
@@ -743,76 +877,103 @@ function planearMaterial(invTemp, orden, original, req){
     }
   }
 
-  return {ok:faltante <= 0, detalle, faltante};
+  if(faltante <= 0) return {ok:true, detalle, faltantes, bulkIgnorados, faltante:0};
+
+  faltantes.push({
+    orden,
+    material:original,
+    requerido:req,
+    disponibleInicial:0,
+    faltante:faltante,
+    tipo: esKanban(original) ? "KANBAN" : "REAL",
+    motivo: esKanban(original) ? "Falta material KANBAN" : (es1SDX(original) ? "Sin inventario directo/alternativo suficiente" : "Sin inventario suficiente")
+  });
+
+  return {ok:false, detalle, faltantes, bulkIgnorados, faltante};
 }
 
 function intentarOrden(orden, invBase){
   const invTemp = clonar(invBase);
   const detalleOrden = [];
   const faltantes = [];
+  const bulkIgnorados = [];
   const materiales = ordenes[orden] || {};
 
   for(const mat of Object.keys(materiales)){
     const req = materiales[mat];
     const plan = planearMaterial(invTemp, orden, mat, req);
-
-    if(!plan.ok){
-      faltantes.push({
-        orden,
-        material:mat,
-        requerido:req,
-        disponibleInicial:disponibleEn(invBase, mat),
-        faltante:plan.faltante,
-        motivo:es1SDX(mat) ? "Sin inventario directo/alternativo suficiente" : "Sin inventario suficiente"
-      });
-
-      return {ok:false, detalle:detalleOrden.concat(plan.detalle), faltantes, invResultante:invBase};
-    }
-
     detalleOrden.push(...plan.detalle);
+    bulkIgnorados.push(...plan.bulkIgnorados);
+    faltantes.push(...plan.faltantes.map(f=>({...f, disponibleInicial:disponibleEn(invBase, mat)})));
   }
 
-  return {ok:true, detalle:detalleOrden, faltantes:[], invResultante:invTemp};
+  const faltantesReales = faltantes.filter(f=>f.tipo !== "KANBAN");
+  const faltantesKanban = faltantes.filter(f=>f.tipo === "KANBAN");
+
+  if(faltantesReales.length === 0 && faltantesKanban.length === 0){
+    return {status:"COMPLETA", ok:true, detalle:detalleOrden, faltantes:[], kanban:faltantesKanban, bulkIgnorados, invResultante:invTemp};
+  }
+
+  if(faltantesReales.length === 0 && faltantesKanban.length > 0){
+    return {status:"COMPLETA SI LLEGA KANBAN", ok:false, detalle:detalleOrden, faltantes:[], kanban:faltantesKanban, bulkIgnorados, invResultante:invBase};
+  }
+
+  return {status:"NO COMPLETA", ok:false, detalle:detalleOrden, faltantes:faltantesReales, kanban:faltantesKanban, bulkIgnorados, invResultante:invBase};
+}
+
+function tipoDesviacionOrden(detalle){
+  const hasDirecta = detalle.some(d=>d.tipo === "DIRECTA");
+  const hasFF = detalle.some(d=>d.tipo === "FF");
+  if(hasDirecta && hasFF) return "DIRECTAS + FF";
+  if(hasDirecta) return "SOLO DIRECTAS";
+  if(hasFF) return "SOLO FF";
+  return "SIN DESVIACIÓN";
 }
 
 function simular(listaOrdenes){
   inventarioTrabajo = clonar(inventarioInicial);
   resultadosGlobal = [];
   desviacionesGlobal = [];
+  kanbanGlobal = [];
+  bulkGlobal = [];
   faltantesGlobal = [];
   materialesUsadosSet = new Set(materialesOrdenBaseSet);
 
   listaOrdenes.forEach(orden=>{
     const intento = intentarOrden(orden, inventarioTrabajo);
 
-    if(intento.ok){
+    if(intento.status === "COMPLETA"){
       inventarioTrabajo = intento.invResultante;
-
-      intento.detalle.forEach(d=>{
-        materialesUsadosSet.add(d.material);
-        materialesUsadosSet.add(d.usado);
-
-        if(d.tipo === "DIRECTA" || d.tipo === "FF"){
-          desviacionesGlobal.push({
-            orden:d.orden,
-            materialOriginal:d.material,
-            materialUsado:d.usado,
-            tipo:d.tipo,
-            cantidad:d.cantidad,
-            altOriginal:altMap[d.material] || "",
-            altUsado:altMap[d.usado] || ""
-          });
-        }
-      });
-    }else{
-      faltantesGlobal.push(...intento.faltantes);
     }
+
+    intento.detalle.forEach(d=>{
+      materialesUsadosSet.add(d.material);
+      if(d.usado && d.usado !== "BULK IGNORADO") materialesUsadosSet.add(d.usado);
+      if(d.tipo === "DIRECTA" || d.tipo === "FF"){
+        desviacionesGlobal.push({
+          orden:d.orden,
+          materialOriginal:d.material,
+          materialUsado:d.usado,
+          tipo:d.tipo,
+          cantidad:d.cantidad,
+          altOriginal:altMap[d.material] || "",
+          altUsado:altMap[d.usado] || ""
+        });
+      }
+    });
+
+    kanbanGlobal.push(...intento.kanban);
+    bulkGlobal.push(...intento.bulkIgnorados);
+    faltantesGlobal.push(...intento.faltantes);
 
     resultadosGlobal.push({
       orden,
-      status:intento.ok,
-      detalle:intento.ok ? intento.detalle : [],
-      faltantes:intento.ok ? [] : intento.faltantes
+      status:intento.status,
+      detalle:intento.detalle,
+      faltantes:intento.faltantes,
+      kanban:intento.kanban,
+      bulkIgnorados:intento.bulkIgnorados,
+      tipoDesviacion: tipoDesviacionOrden(intento.detalle)
     });
   });
 
@@ -822,27 +983,24 @@ function simular(listaOrdenes){
 
 function optimizarOrdenes(lista){
   const invSnapshot = clonar(inventarioInicial);
-
   const scored = lista.map(orden=>{
     const intento = intentarOrden(orden, invSnapshot);
     let score = 0;
+    if(intento.status === "COMPLETA") score += 10000;
+    if(intento.status === "COMPLETA SI LLEGA KANBAN") score += 7000;
+    if(intento.status === "NO COMPLETA") score -= 1000;
+
     const materiales = ordenes[orden] || {};
     const totalItems = Object.keys(materiales).length;
     const totalQty = Object.values(materiales).reduce((a,b)=>a+b,0);
-
-    if(intento.ok) score += 10000;
     score += totalItems * 50;
     score -= totalQty * 0.05;
-
-    const desvDirecta = intento.detalle.filter(d=>d.tipo === "DIRECTA").length;
-    const desvFF = intento.detalle.filter(d=>d.tipo === "FF").length;
-    score -= desvDirecta * 30;
-    score -= desvFF * 80;
+    score -= intento.detalle.filter(d=>d.tipo === "DIRECTA").length * 30;
+    score -= intento.detalle.filter(d=>d.tipo === "FF").length * 80;
+    score -= intento.kanban.length * 120;
     score -= intento.faltantes.length * 500;
-
     return {orden, score};
   });
-
   scored.sort((a,b)=>b.score-a.score);
   return scored.map(x=>x.orden);
 }
@@ -851,130 +1009,120 @@ function renderTodo(){
   actualizarMetricas();
   renderOrdenes();
   renderDesviaciones();
+  renderKanban();
+  renderBulk();
   renderFaltantes();
   renderInventarioFinal();
 }
 
 function actualizarMetricas(){
   const total = resultadosGlobal.length;
-  const ok = resultadosGlobal.filter(r=>r.status).length;
-  const bad = total - ok;
+  const ok = resultadosGlobal.filter(r=>r.status === "COMPLETA").length;
+  const kanban = resultadosGlobal.filter(r=>r.status === "COMPLETA SI LLEGA KANBAN").length;
+  const bad = resultadosGlobal.filter(r=>r.status === "NO COMPLETA").length;
   const directas = desviacionesGlobal.filter(d=>d.tipo === "DIRECTA").length;
   const ff = desviacionesGlobal.filter(d=>d.tipo === "FF").length;
-
   document.getElementById("mTotal").innerText = total;
   document.getElementById("mOk").innerText = ok;
+  document.getElementById("mKanban").innerText = kanban;
   document.getElementById("mBad").innerText = bad;
   document.getElementById("mDirectas").innerText = directas;
   document.getElementById("mFF").innerText = ff;
+  document.getElementById("mBulk").innerText = bulkGlobal.length;
 }
 
 function badge(tipo){
+  if(tipo === "COMPLETA") return `<span class="badge badge-ok">COMPLETA</span>`;
+  if(tipo === "NO COMPLETA") return `<span class="badge badge-bad">NO COMPLETA</span>`;
+  if(tipo === "COMPLETA SI LLEGA KANBAN") return `<span class="badge badge-kanban">COMPLETA SI LLEGA KANBAN</span>`;
   if(tipo === "DIRECTO") return `<span class="badge badge-directo">DIRECTO</span>`;
   if(tipo === "DIRECTA") return `<span class="badge badge-directa">DIRECTA</span>`;
   if(tipo === "FF") return `<span class="badge badge-ff">FF</span>`;
+  if(tipo === "BULK") return `<span class="badge badge-bulk">BULK IGNORADO</span>`;
+  if(tipo === "KANBAN") return `<span class="badge badge-kanban">KANBAN</span>`;
+  if(tipo === "DIRECTAS + FF" || tipo === "SOLO DIRECTAS" || tipo === "SOLO FF") return `<span class="badge badge-mix">${tipo}</span>`;
   return `<span class="badge">${tipo}</span>`;
 }
 
 function renderOrdenes(){
   const q = (document.getElementById("buscarOrden")?.value || "").toLowerCase();
-  let html = `<tr><th>Secuencia</th><th>Orden</th><th>Status</th><th>Detalle de materiales</th></tr>`;
+  let html = `<tr><th>Secuencia</th><th>Orden</th><th>Status</th><th>Tipo desviación</th><th>Detalle</th></tr>`;
 
   resultadosGlobal.forEach((r, idx)=>{
     const detalleTexto = r.detalle.map(d=>`${d.material} ${d.usado} ${d.tipo}`).join(" ").toLowerCase();
-    const faltantesTexto = r.faltantes.map(f=>`${f.material}`).join(" ").toLowerCase();
-    const searchText = `${r.orden} ${detalleTexto} ${faltantesTexto}`.toLowerCase();
+    const faltantesTexto = r.faltantes.concat(r.kanban).map(f=>`${f.material}`).join(" ").toLowerCase();
+    const searchText = `${r.orden} ${r.status} ${r.tipoDesviacion} ${detalleTexto} ${faltantesTexto}`.toLowerCase();
     if(q && !searchText.includes(q)) return;
 
-    let detalle = "";
+    const detalleOK = r.detalle.map(d=>{
+      const flecha = d.material === d.usado ? "" : ` → <b>${d.usado}</b>`;
+      return `<div><b>${d.material}</b>${flecha} ${badge(d.tipo)} <span class="small">Qty: ${d.cantidad}</span></div>`;
+    }).join("");
 
-    if(r.status){
-      detalle = r.detalle.map(d=>{
-        const flecha = d.material === d.usado ? "" : ` → <b>${d.usado}</b>`;
-        return `<div><b>${d.material}</b>${flecha} ${badge(d.tipo)} <span class="small">Qty: ${d.cantidad}</span></div>`;
-      }).join("");
-    }else{
-      detalle = r.faltantes.map(f=>`
-        <div>
-          <b>${f.material}</b>
-          <span class="badge badge-bad">FALTANTE</span>
-          <span class="small">Req: ${f.requerido} | Disp directo: ${f.disponibleInicial} | Faltante: ${f.faltante}</span>
-        </div>
-      `).join("");
-    }
+    const detalleK = r.kanban.map(f=>`<div><b>${f.material}</b> ${badge("KANBAN")} <span class="small">Falta: ${f.faltante} de ${f.requerido}</span></div>`).join("");
+    const detalleF = r.faltantes.map(f=>`<div><b>${f.material}</b> <span class="badge badge-bad">FALTANTE REAL</span> <span class="small">Req: ${f.requerido} | Disp directo: ${f.disponibleInicial} | Faltante: ${f.faltante}</span></div>`).join("");
+    const detalleB = r.bulkIgnorados.map(b=>`<div><b>${b.material}</b> ${badge("BULK")} <span class="small">Ignorado faltante: ${b.faltante}</span></div>`).join("");
 
+    const rowClass = r.status === "COMPLETA" ? "ok-row" : (r.status === "COMPLETA SI LLEGA KANBAN" ? "kanban-row" : "bad-row");
     html += `
-      <tr class="${r.status ? 'ok-row':'bad-row'}">
+      <tr class="${rowClass}">
         <td>${idx + 1}</td>
         <td><b>${r.orden}</b></td>
-        <td>${r.status ? '<span class="badge badge-ok">COMPLETA</span>' : '<span class="badge badge-bad">NO COMPLETA</span>'}</td>
-        <td>${detalle}</td>
+        <td>${badge(r.status)}</td>
+        <td>${badge(r.tipoDesviacion)}</td>
+        <td>${detalleOK}${detalleK}${detalleF}${detalleB}</td>
       </tr>
     `;
   });
-
   document.getElementById("tablaOrdenes").innerHTML = html;
 }
 
 function renderDesviaciones(){
   let html = `<tr><th>Orden</th><th>Material original</th><th>Material usado</th><th>Tipo</th><th>Cantidad</th><th>Alternative original</th><th>Alternative usado</th></tr>`;
-
-  if(!desviacionesGlobal.length){
-    html += `<tr><td colspan="7" class="small">No se aplicaron desviaciones 1SDX.</td></tr>`;
-  }
-
+  if(!desviacionesGlobal.length) html += `<tr><td colspan="7" class="small">No se aplicaron desviaciones 1SDX.</td></tr>`;
   desviacionesGlobal.forEach(d=>{
-    html += `
-      <tr>
-        <td><b>${d.orden}</b></td>
-        <td>${d.materialOriginal}</td>
-        <td><b>${d.materialUsado}</b></td>
-        <td>${badge(d.tipo)}</td>
-        <td>${d.cantidad}</td>
-        <td>${d.altOriginal}</td>
-        <td>${d.altUsado}</td>
-      </tr>
-    `;
+    html += `<tr><td><b>${d.orden}</b></td><td>${d.materialOriginal}</td><td><b>${d.materialUsado}</b></td><td>${badge(d.tipo)}</td><td>${d.cantidad}</td><td>${d.altOriginal}</td><td>${d.altUsado}</td></tr>`;
   });
-
   document.getElementById("tablaDesviaciones").innerHTML = html;
+}
+
+function renderKanban(){
+  let html = `<tr><th>Orden</th><th>Material KANBAN</th><th>Requerido</th><th>Disponible directo</th><th>Faltante</th><th>Status</th></tr>`;
+  if(!kanbanGlobal.length) html += `<tr><td colspan="6" class="small">No hay órdenes condicionadas por KANBAN.</td></tr>`;
+  kanbanGlobal.forEach(f=>{
+    html += `<tr><td><b>${f.orden}</b></td><td>${f.material}</td><td>${f.requerido}</td><td>${f.disponibleInicial}</td><td><b>${f.faltante}</b></td><td>${badge("KANBAN")}</td></tr>`;
+  });
+  document.getElementById("tablaKanban").innerHTML = html;
+}
+
+function renderBulk(){
+  let html = `<tr><th>Orden</th><th>Material BULK</th><th>Requerido</th><th>Faltante ignorado</th><th>Regla</th></tr>`;
+  if(!bulkGlobal.length) html += `<tr><td colspan="5" class="small">No hubo faltantes BULK ignorados.</td></tr>`;
+  bulkGlobal.forEach(b=>{
+    html += `<tr><td><b>${b.orden}</b></td><td>${b.material}</td><td>${b.requerido}</td><td><b>${b.faltante}</b></td><td>${badge("BULK")}</td></tr>`;
+  });
+  document.getElementById("tablaBulk").innerHTML = html;
 }
 
 function renderFaltantes(){
   let html = `<tr><th>Orden</th><th>Material</th><th>Requerido</th><th>Disponible directo</th><th>Faltante</th><th>Motivo</th></tr>`;
-
-  if(!faltantesGlobal.length){
-    html += `<tr><td colspan="6" class="small">No hay faltantes en las órdenes no completadas o todas completaron.</td></tr>`;
-  }
-
+  if(!faltantesGlobal.length) html += `<tr><td colspan="6" class="small">No hay faltantes reales no KANBAN.</td></tr>`;
   faltantesGlobal.forEach(f=>{
-    html += `
-      <tr>
-        <td><b>${f.orden}</b></td>
-        <td>${f.material}</td>
-        <td>${f.requerido}</td>
-        <td>${f.disponibleInicial}</td>
-        <td><b>${f.faltante}</b></td>
-        <td>${f.motivo}</td>
-      </tr>
-    `;
+    html += `<tr><td><b>${f.orden}</b></td><td>${f.material}</td><td>${f.requerido}</td><td>${f.disponibleInicial}</td><td><b>${f.faltante}</b></td><td>${f.motivo}</td></tr>`;
   });
-
   document.getElementById("tablaFaltantes").innerHTML = html;
 }
 
 function renderInventarioFinal(){
   const q = (document.getElementById("buscarInv")?.value || "").toLowerCase();
-  let html = `<tr><th>Material</th><th>FLOR final</th><th>STCK final</th><th>PROG</th><th>Disponible final</th></tr>`;
-
+  let html = `<tr><th>Material</th><th>FLOR final</th><th>STCK final</th><th>PROG</th><th>Disponible final</th><th>Tipo fijo</th></tr>`;
   const mats = Array.from(materialesUsadosSet).sort();
   mats.forEach(mat=>{
     if(q && !mat.toLowerCase().includes(q)) return;
     const d = inventarioFinalGlobal[mat] || {flor:0, stck:0, prog:0};
-    const disp = disponibleEn(inventarioFinalGlobal, mat);
-    html += `<tr><td><b>${mat}</b></td><td>${num(d.flor)}</td><td>${num(d.stck)}</td><td>${num(d.prog)}</td><td><b>${disp}</b></td></tr>`;
+    const tipo = esBulk(mat) ? badge("BULK") : (esKanban(mat) ? badge("KANBAN") : "");
+    html += `<tr><td><b>${mat}</b></td><td>${num(d.flor)}</td><td>${num(d.stck)}</td><td>${num(d.prog)}</td><td><b>${disponibleEn(inventarioFinalGlobal, mat)}</b></td><td>${tipo}</td></tr>`;
   });
-
   document.getElementById("tablaInventario").innerHTML = html;
 }
 
@@ -982,96 +1130,53 @@ function mostrarTab(tab, btn){
   document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
   document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
-
   if(tab === "ordenes") document.getElementById("panelOrdenes").classList.add("active");
   if(tab === "desviaciones") document.getElementById("panelDesviaciones").classList.add("active");
+  if(tab === "kanban") document.getElementById("panelKanban").classList.add("active");
+  if(tab === "bulk") document.getElementById("panelBulk").classList.add("active");
   if(tab === "faltantes") document.getElementById("panelFaltantes").classList.add("active");
   if(tab === "inventario") document.getElementById("panelInventario").classList.add("active");
 }
 
 function exportarExcel(){
-  if(!resultadosGlobal.length){
-    alert("Primero corre una simulación u optimización.");
-    return;
-  }
+  if(!resultadosGlobal.length){ alert("Primero corre una simulación u optimización."); return; }
 
   const resumen = resultadosGlobal.map((r, idx)=>({
     Secuencia:idx + 1,
     Orden:r.orden,
-    Status:r.status ? "Completa" : "No completa",
+    Status:r.status,
+    TipoDesviacion:r.tipoDesviacion,
     LineasMaterial:r.detalle.length,
-    Faltantes:r.faltantes.length
+    FaltantesReales:r.faltantes.length,
+    FaltantesKanban:r.kanban.length,
+    BulksIgnorados:r.bulkIgnorados.length
   }));
 
   const detalle = [];
-
   resultadosGlobal.forEach((r, idx)=>{
-    if(r.status){
-      r.detalle.forEach(d=>{
-        detalle.push({
-          Secuencia:idx + 1,
-          Orden:r.orden,
-          Status:"Completa",
-          MaterialOriginal:d.material,
-          MaterialUsado:d.usado,
-          Tipo:d.tipo,
-          Cantidad:d.cantidad,
-          AlternativeOriginal:altMap[d.material] || "",
-          AlternativeUsado:altMap[d.usado] || ""
-        });
-      });
-    }else{
-      r.faltantes.forEach(f=>{
-        detalle.push({
-          Secuencia:idx + 1,
-          Orden:r.orden,
-          Status:"No completa",
-          MaterialOriginal:f.material,
-          MaterialUsado:"",
-          Tipo:"FALTANTE",
-          Cantidad:f.requerido,
-          AlternativeOriginal:altMap[f.material] || "",
-          AlternativeUsado:""
-        });
-      });
-    }
+    r.detalle.forEach(d=>{
+      detalle.push({Secuencia:idx+1, Orden:r.orden, Status:r.status, TipoDesviacionOrden:r.tipoDesviacion, MaterialOriginal:d.material, MaterialUsado:d.usado, Tipo:d.tipo, Cantidad:d.cantidad, AlternativeOriginal:altMap[d.material]||"", AlternativeUsado:altMap[d.usado]||""});
+    });
+    r.faltantes.forEach(f=> detalle.push({Secuencia:idx+1, Orden:r.orden, Status:r.status, Tipo:"FALTANTE REAL", MaterialOriginal:f.material, MaterialUsado:"", Cantidad:f.requerido, Faltante:f.faltante}));
+    r.kanban.forEach(f=> detalle.push({Secuencia:idx+1, Orden:r.orden, Status:r.status, Tipo:"KANBAN FALTANTE", MaterialOriginal:f.material, MaterialUsado:"", Cantidad:f.requerido, Faltante:f.faltante}));
   });
 
-  const desviaciones = desviacionesGlobal.map(d=>({
-    Orden:d.orden,
-    MaterialOriginal:d.materialOriginal,
-    MaterialUsado:d.materialUsado,
-    Tipo:d.tipo,
-    Cantidad:d.cantidad,
-    AlternativeOriginal:d.altOriginal,
-    AlternativeUsado:d.altUsado
-  }));
-
-  const faltantes = faltantesGlobal.map(f=>({
-    Orden:f.orden,
-    Material:f.material,
-    Requerido:f.requerido,
-    DisponibleDirecto:f.disponibleInicial,
-    Faltante:f.faltante,
-    Motivo:f.motivo
-  }));
-
+  const desviaciones = desviacionesGlobal.map(d=>({Orden:d.orden, MaterialOriginal:d.materialOriginal, MaterialUsado:d.materialUsado, Tipo:d.tipo, Cantidad:d.cantidad, AlternativeOriginal:d.altOriginal, AlternativeUsado:d.altUsado}));
+  const kanban = kanbanGlobal.map(f=>({Orden:f.orden, Material:f.material, Requerido:f.requerido, DisponibleDirecto:f.disponibleInicial, Faltante:f.faltante, Status:"COMPLETA SI LLEGA KANBAN"}));
+  const bulk = bulkGlobal.map(b=>({Orden:b.orden, Material:b.material, Requerido:b.requerido, FaltanteIgnorado:b.faltante, Regla:"BULK NO BLOQUEA"}));
+  const faltantes = faltantesGlobal.map(f=>({Orden:f.orden, Material:f.material, Requerido:f.requerido, DisponibleDirecto:f.disponibleInicial, Faltante:f.faltante, Motivo:f.motivo}));
   const inventario = Array.from(materialesUsadosSet).sort().map(mat=>{
     const d = inventarioFinalGlobal[mat] || {flor:0, stck:0, prog:0};
-    return {
-      Material:mat,
-      FLOR_Final:num(d.flor),
-      STCK_Final:num(d.stck),
-      PROG:num(d.prog),
-      Disponible_Final:disponibleEn(inventarioFinalGlobal, mat)
-    };
+    return {Material:mat, FLOR_Final:num(d.flor), STCK_Final:num(d.stck), PROG:num(d.prog), Disponible_Final:disponibleEn(inventarioFinalGlobal, mat), EsBulk:esBulk(mat)?"SI":"NO", EsKanban:esKanban(mat)?"SI":"NO"};
   });
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resumen), "Resumen");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(detalle), "Detalle");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(desviaciones), "Desviaciones");
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(faltantes), "Faltantes");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(kanban), "Kanban");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(bulk), "Bulk");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(faltantes), "Faltantes Reales");
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(inventario), "Inventario Final");
   XLSX.writeFile(wb, "resultado_planeador_1SDX.xlsx");
 }
@@ -1079,22 +1184,20 @@ function exportarExcel(){
 function limpiarResultados(){
   resultadosGlobal = [];
   desviacionesGlobal = [];
+  kanbanGlobal = [];
+  bulkGlobal = [];
   faltantesGlobal = [];
   inventarioFinalGlobal = {};
   materialesUsadosSet = new Set();
-
-  document.getElementById("mTotal").innerText = "0";
-  document.getElementById("mOk").innerText = "0";
-  document.getElementById("mBad").innerText = "0";
-  document.getElementById("mDirectas").innerText = "0";
-  document.getElementById("mFF").innerText = "0";
-
-  document.getElementById("tablaOrdenes").innerHTML = "";
-  document.getElementById("tablaDesviaciones").innerHTML = "";
-  document.getElementById("tablaFaltantes").innerHTML = "";
-  document.getElementById("tablaInventario").innerHTML = "";
+  ["mTotal","mOk","mKanban","mBad","mDirectas","mFF","mBulk"].forEach(id=>document.getElementById(id).innerText="0");
+  ["tablaOrdenes","tablaDesviaciones","tablaKanban","tablaBulk","tablaFaltantes","tablaInventario"].forEach(id=>document.getElementById(id).innerHTML="");
   setStatus("Resultados limpiados. Puedes cargar o correr de nuevo.");
 }
+
+window.addEventListener("load", ()=>{
+  cargarBasesDesdeStorage();
+  setStatus("Listo. Si ya guardaste bases fijas, carga SOLO PICK / FLOR / STCK / PROG y simula.");
+});
 </script>
 
 </body>
