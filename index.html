@@ -6,29 +6,276 @@
 <title>Planeador PRO 1SDX</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--bg:#f4f7fb;--card:#fff;--text:#1f2937;--muted:#6b7280;--border:#e5e7eb;--primary:#2563eb;--green:#dcfce7;--green-text:#166534;--red:#fee2e2;--red-text:#991b1b;--yellow:#fef9c3;--yellow-text:#854d0e;--blue-soft:#dbeafe;--blue-text:#1e40af;--purple:#ede9fe;--purple-text:#5b21b6;--orange:#ffedd5;--orange-text:#9a3412;--gray:#f3f4f6;--gray-text:#374151;--cyan:#cffafe;--cyan-text:#155e75;--indigo:#e0e7ff;--indigo-text:#3730a3;--shadow:0 10px 25px rgba(15,23,42,.08)}
-*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}.header{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:white;padding:28px 32px}.header h1{margin:0;font-size:28px}.header p{margin:8px 0 0;opacity:.9}.container{padding:24px 32px 40px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:var(--shadow)}.card h2{margin:0 0 12px;font-size:18px}.file-box{border:1px dashed #cbd5e1;border-radius:12px;padding:14px;margin-bottom:10px;background:#f8fafc}.file-box label{display:block;font-size:13px;font-weight:700;color:#334155;margin-bottom:6px}.file-box input{width:100%;font-size:12px}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}button{border:0;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer}button.primary{background:var(--primary);color:white}button.secondary{background:#111827;color:white}button.light{background:#e5e7eb;color:#111827}button.export{background:#16a34a;color:white}button.warn{background:#f97316;color:white}button.cyan{background:#0891b2;color:white}.status-bar{margin-top:16px;padding:12px 14px;border-radius:12px;background:#eff6ff;color:#1d4ed8;font-size:13px}.metrics{display:grid;grid-template-columns:repeat(10,1fr);gap:14px;margin-top:18px}.metric{background:white;border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:var(--shadow)}.metric .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:700}.metric .value{font-size:24px;font-weight:800;margin-top:6px}.tabs{display:flex;gap:10px;margin:22px 0 12px;flex-wrap:wrap}.tab-btn{background:white;border:1px solid var(--border);color:#111827}.tab-btn.active{background:var(--primary);color:white;border-color:var(--primary)}.panel{display:none}.panel.active{display:block}.table-wrap{overflow:auto;background:white;border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}table{width:100%;border-collapse:collapse;min-width:1100px}th{position:sticky;top:0;background:#f8fafc;z-index:1;color:#334155;font-size:12px;text-transform:uppercase;letter-spacing:.04em}th,td{border-bottom:1px solid var(--border);padding:10px 12px;vertical-align:top;font-size:13px}tr:hover{background:#f9fafb}.ok-row{background:#f7fff9}.bad-row{background:#fff7f7}.kanban-row{background:#fffbeb}.llegada-row{background:#ecfeff}.opcion-row{background:#fefce8}.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:800;white-space:nowrap;margin:1px 2px}.badge-ok{background:var(--green);color:var(--green-text)}.badge-bad{background:var(--red);color:var(--red-text)}.badge-directo{background:var(--blue-soft);color:var(--blue-text)}.badge-directa{background:var(--yellow);color:var(--yellow-text)}.badge-ff{background:var(--purple);color:var(--purple-text)}.badge-kanban{background:var(--orange);color:var(--orange-text)}.badge-bulk{background:var(--gray);color:var(--gray-text)}.badge-mix{background:var(--indigo);color:var(--indigo-text)}.badge-llegada{background:var(--cyan);color:var(--cyan-text)}.badge-reserva{background:#e0f2fe;color:#075985}.search-row{display:flex;gap:12px;margin-bottom:12px;align-items:center;flex-wrap:wrap}.search-row input{width:280px;border:1px solid var(--border);border-radius:10px;padding:10px}.small{color:var(--muted);font-size:12px}.warning{margin-top:12px;padding:12px 14px;border-radius:12px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;font-size:13px}.ok-note{margin-top:12px;padding:12px 14px;border-radius:12px;background:#ecfdf5;color:#166534;border:1px solid #bbf7d0;font-size:13px}.fixed-status{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px;font-size:12px}.fixed-chip{border:1px solid var(--border);background:#f8fafc;border-radius:10px;padding:8px;color:#334155}.summary-box{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px}.summary-card{background:white;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow)}.summary-card h3{margin:0 0 8px;font-size:16px}@media(max-width:1250px){.grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}.summary-box{grid-template-columns:1fr}}@media(max-width:700px){.container{padding:16px}.header{padding:22px 18px}.metrics{grid-template-columns:1fr}}
+:root{--ink:#0a0a0a;--paper:#ffffff;--paper-soft:#f6f6f3;--line:#e3e1da;--line-strong:#cbc8c0;--muted:#5f5f5c;--red:#ff000f;--red-dark:#c40010;--green:#1c7a4c;--green-bg:#eef7f1;--amber:#9a6a00;--amber-bg:#fbf3e1;--blue:#1e4d8c;--blue-bg:#eaf1fb;--font-sans:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif;--font-mono:ui-monospace,"SF Mono","Cascadia Mono",Consolas,monospace;--radius:6px}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font-sans);background:var(--paper-soft);color:var(--ink);-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0}
+button:focus-visible,input:focus-visible,.tab:focus-visible,.subtab:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+
+.topbar{background:var(--paper);border-bottom:3px solid var(--red);padding:20px 32px;display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
+.brand{display:flex;align-items:flex-start;gap:16px}
+.brand-mark{font-weight:800;font-size:15px;letter-spacing:.08em;color:var(--red);padding-top:6px}
+.brand-title h1{font-size:25px;font-weight:800;letter-spacing:-.01em}
+.brand-title h1 span{color:var(--muted);font-weight:600}
+.brand-title p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.topbar-status{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);white-space:nowrap;padding-top:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block}
+
+.container{max-width:1180px;margin:0 auto;padding:28px 32px 60px}
+.section-head h2{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.section-head p{margin:3px 0 0;font-size:13px;color:var(--muted)}
+
+.workflow{display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px}
+
+.file-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:16px}
+.file-box{border:1px solid var(--line);border-radius:var(--radius);padding:12px;background:var(--paper-soft)}
+.file-box label{display:block;font-size:12px;font-weight:700;color:var(--ink);margin-bottom:6px;cursor:pointer}
+.file-box input{width:100%;font-size:12px;color:var(--muted)}
+
+.run-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.toggle{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink);cursor:pointer}
+.toggle input{width:16px;height:16px;accent-color:var(--red)}
+.run-actions,.export-actions{display:flex;flex-wrap:wrap;gap:10px}
+.export-actions{padding-left:16px;border-left:1px solid var(--line)}
+
+button{font-family:var(--font-sans);cursor:pointer;border-radius:var(--radius);font-size:13px;font-weight:700;padding:10px 16px;border:1px solid transparent}
+.btn-primary{background:var(--red);color:#fff}
+.btn-primary:hover{background:var(--red-dark)}
+.btn-outline{background:var(--paper);color:var(--ink);border-color:var(--line-strong)}
+.btn-outline:hover{border-color:var(--ink)}
+.btn-ghost{background:transparent;color:var(--muted);border-color:var(--line)}
+.btn-ghost:hover{color:var(--ink);border-color:var(--line-strong)}
+.btn-text{background:transparent;color:var(--muted);border-color:transparent;padding:10px 8px}
+.btn-text:hover{color:var(--ink)}
+.btn-danger-outline{background:var(--paper);color:var(--red-dark);border-color:var(--red)}
+.btn-danger-outline:hover{background:#fff0f1}
+
+.fixed-status{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.fixed-chip{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:4px 8px;background:var(--paper)}
+.fixed-chip b{color:var(--ink)}
+.accordion-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;background:transparent;border:none;padding:0;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink)}
+.accordion-trigger .muted{font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted);font-size:12px}
+.chev{transition:transform .15s ease;color:var(--muted)}
+.accordion-trigger.open .chev{transform:rotate(180deg)}
+.accordion-body{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.accordion-body .file-grid{grid-template-columns:1fr}
+.accordion-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+
+.metrics{margin-top:28px;display:grid;grid-template-columns:2fr 2fr 1fr;gap:20px}
+.metric-group h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:10px}
+.metric-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px}
+.metric{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
+.metric .value{display:block;font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+.metric .label{display:block;font-size:11px;color:var(--muted);margin-top:2px;text-transform:none;letter-spacing:0;font-weight:400}
+.metric.flag .value{color:var(--red)}
+
+.results{margin-top:32px}
+.tabs{display:flex;gap:22px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tab{background:none;border:none;border-bottom:2px solid transparent;padding:10px 2px;font-size:14px;font-weight:600;color:var(--muted);border-radius:0}
+.tab.active{color:var(--ink);font-weight:700;border-bottom-color:var(--red)}
+.subtabs{display:flex;gap:8px;margin:14px 0 0;flex-wrap:wrap}
+.subtab{background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--muted)}
+.subtab.active{border-color:var(--ink);color:var(--ink)}
+
+.panel{display:none;padding-top:20px}
+.panel.active{display:block}
+
+.table-wrap{overflow:auto;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius)}
+table{width:100%;border-collapse:collapse;min-width:1100px}
+th{position:sticky;top:0;background:var(--paper-soft);z-index:1;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+td{border-bottom:1px solid var(--line);padding:10px 12px;vertical-align:top;font-size:13px;font-variant-numeric:tabular-nums}
+tr:hover{background:var(--paper-soft)}
+tr:last-child td{border-bottom:none}
+td b{font-family:var(--font-mono);font-weight:600}
+
+.ok-row{background:var(--paper)}
+.bad-row{background:#fff5f5}
+.kanban-row{background:var(--amber-bg)}
+.llegada-row{background:var(--blue-bg)}
+.opcion-row{background:var(--paper-soft)}
+
+.badge{display:inline-block;padding:2px 9px;border-radius:4px;font-size:11px;font-weight:700;white-space:nowrap;margin:1px 2px;border:1px solid}
+.badge-ok{color:var(--green);border-color:var(--green);background:var(--green-bg)}
+.badge-bad{color:var(--red-dark);border-color:var(--red);background:#fff0f1}
+.badge-kanban{color:var(--amber);border-color:var(--amber);background:var(--amber-bg)}
+.badge-reserva{color:var(--amber);border-color:var(--amber);background:var(--amber-bg)}
+.badge-llegada{color:var(--blue);border-color:var(--blue);background:var(--blue-bg)}
+.badge-directo,.badge-directa,.badge-ff,.badge-mix,.badge-bulk{color:var(--muted);border-color:var(--line-strong);background:var(--paper)}
+
+.search-row{display:flex;gap:12px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.search-row input{width:280px;border:1px solid var(--line);border-radius:var(--radius);padding:10px;font-family:var(--font-sans)}
+.small{color:var(--muted);font-size:12px}
+
+.warning{margin-top:14px;padding:12px 14px;border-radius:var(--radius);background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber);font-size:13px}
+.ok-note{margin-top:16px;padding:12px 14px;border-radius:var(--radius);background:var(--green-bg);color:var(--green);border:1px solid var(--green);font-size:13px}
+
+.summary-box{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px}
+.summary-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.summary-card h3{margin:0 0 8px;font-size:15px}
+
+#status{border-radius:var(--radius);padding:11px 14px;font-size:13px;border:1px solid var(--line);background:var(--paper-soft);color:var(--ink);margin-top:0}
+#status.status-neutral{background:var(--paper-soft);border-color:var(--line);color:var(--ink)}
+#status.status-success{background:var(--green-bg);border-color:var(--green);color:var(--green)}
+#status.status-error{background:#fff0f1;border-color:var(--red);color:var(--red-dark)}
+
+@media(max-width:1250px){
+  .workflow{grid-template-columns:1fr}
+  .metrics{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .topbar{flex-direction:column}
+  .container{padding:20px 18px 40px}
+  .run-row{flex-direction:column;align-items:flex-start}
+  .export-actions{border-left:none;padding-left:0;border-top:1px solid var(--line);padding-top:12px}
+}
 </style>
 </head>
 <body>
-<div class="header"><h1>🧠 Planeador PRO 1SDX</h1><p>Simulación / optimización con FLOR + STCK - PROG, desviaciones DIRECTA/FF, TOP LEVEL x TOP LEVEL, PLAN EXTRA, BULK, KANBAN y llegadas.</p></div>
-<div class="container">
-  <div class="grid">
-    <div class="card"><h2>1. Órdenes e inventario</h2><div class="file-box"><label>SOLO PICK / Órdenes</label><input type="file" id="pick" accept=".xlsx,.xls,.csv"/></div><div class="file-box"><label>FLOR</label><input type="file" id="flor" accept=".xlsx,.xls,.csv"/></div><div class="file-box"><label>STCK</label><input type="file" id="stck" accept=".xlsx,.xls,.csv"/></div><div class="file-box"><label>PROG / Programado</label><input type="file" id="prog" accept=".xlsx,.xls,.csv"/></div><div class="file-box"><label>LLEGADAS / Material recibido o por llegar (opcional)</label><input type="file" id="llegadas" accept=".xlsx,.xls,.csv"/></div></div>
-    <div class="card"><h2>2. Bases fijas</h2><div class="file-box"><label>BASE DE DATOS V2 / Material → Alternative Number</label><input type="file" id="alt" accept=".xlsx,.xls,.csv"/></div><div class="file-box"><label>QR A FF / Tabla QR → FF</label><input type="file" id="ff" accept=".xlsx,.xls,.csv"/></div><div class="file-box"><label>BASE TOP / Top Level → QRCODE / FFQRCODE</label><input type="file" id="topbase" accept=".xlsx,.xls,.csv"/></div><div class="file-box"><label>PAPAS BD / Orden → TOP LEVEL → HIJO</label><input type="file" id="papas" accept=".xlsx,.xls,.csv"/></div><div class="file-box"><label>BULK / Materiales que no bloquean orden</label><input type="file" id="bulk" accept=".xlsx,.xls,.csv"/></div><div class="file-box"><label>KANBAN / Materiales de llegada continua</label><input type="file" id="kanban" accept=".xlsx,.xls,.csv"/></div><div class="actions"><button class="warn" onclick="guardarBasesFijas()">💾 Guardar / actualizar bases fijas</button><button class="light" onclick="borrarBasesFijas()">🗑️ Borrar bases fijas</button><button class="light" onclick="borrarHistorial()">🧾 Borrar historial</button></div><div id="fixedStatus" class="fixed-status"></div><div class="warning"><b>Nota:</b> BASE 1SDX, QR→FF, BASE TOP, PAPAS BD, BULK y KANBAN se guardan en este navegador con localStorage.</div></div>
-    <div class="card"><h2>3. Ejecutar</h2><p class="small">Para analizar llegadas, carga el archivo LLEGADAS y usa los botones cyan.</p><div class="actions"><button class="primary" onclick="cargarDatosYSimular(false,false)">📊 Simular</button><button class="secondary" onclick="cargarDatosYSimular(true,false)">🚀 Optimizar</button><button class="cyan" onclick="cargarDatosYSimular(false,true)">📦 Simular con llegadas</button><button class="cyan" onclick="cargarDatosYSimular(true,true)">📦🚀 Optimizar con llegadas</button><button class="export" onclick="exportarExcel()">📥 Exportar Excel completo</button><button class="export" onclick="exportarPlanProduccion()">✅ Exportar plan</button><button class="light" onclick="limpiarResultados()">🧹 Limpiar</button></div><div id="status" class="status-bar">Esperando archivos...</div><div class="ok-note"><b>Corrección incluida:</b> Las órdenes <b>COMPLETA SI LLEGA KANBAN</b> ahora reservan/consumen inventario directo para no reutilizar el mismo stock en otras órdenes.</div></div>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">ABB</span>
+    <div class="brand-title">
+      <h1>Planeador PRO <span>1SDX</span></h1>
+      <p>Simulación / optimización con FLOR + STCK - PROG, desviaciones DIRECTA/FF, TOP LEVEL x TOP LEVEL, PLAN EXTRA, BULK, KANBAN y llegadas.</p>
+    </div>
   </div>
-  <div class="metrics"><div class="metric"><div class="label">Órdenes</div><div class="value" id="mTotal">0</div></div><div class="metric"><div class="label">Completas</div><div class="value" id="mOk">0</div></div><div class="metric"><div class="label">Si llega kanban</div><div class="value" id="mKanban">0</div></div><div class="metric"><div class="label">No completas</div><div class="value" id="mBad">0</div></div><div class="metric"><div class="label">Por llegada</div><div class="value" id="mLlegadasImpacto">0</div></div><div class="metric"><div class="label">Directas aplicadas</div><div class="value" id="mDirectas">0</div></div><div class="metric"><div class="label">FF aplicadas</div><div class="value" id="mFF">0</div></div><div class="metric"><div class="label">TOP/PLAN aplicadas</div><div class="value" id="mTopPlan">0</div></div><div class="metric"><div class="label">Opc. desviación</div><div class="value" id="mOpcionesDesv">0</div></div><div class="metric"><div class="label">Bulk</div><div class="value" id="mBulk">0</div></div></div>
-  <div class="tabs"><button class="tab-btn active" onclick="mostrarTab('resumen', this)">Resumen</button><button class="tab-btn" onclick="mostrarTab('ordenes', this)">Órdenes</button><button class="tab-btn" onclick="mostrarTab('consumo', this)">Consumo por origen</button><button class="tab-btn" onclick="mostrarTab('llegadas', this)">Impacto llegadas</button><button class="tab-btn" onclick="mostrarTab('criticos', this)">Críticos</button><button class="tab-btn" onclick="mostrarTab('desviaciones', this)">Desviaciones aplicadas</button><button class="tab-btn" onclick="mostrarTab('opciones', this)">Opciones desviación</button><button class="tab-btn" onclick="mostrarTab('kanban', this)">Faltantes KANBAN</button><button class="tab-btn" onclick="mostrarTab('bulk', this)">BULK</button><button class="tab-btn" onclick="mostrarTab('faltantes', this)">Faltantes reales</button><button class="tab-btn" onclick="mostrarTab('inventario', this)">Inventario final</button><button class="tab-btn" onclick="mostrarTab('historial', this)">Historial</button></div>
-  <div id="panelResumen" class="panel active"><div id="resumenEjecutivo"></div></div>
-  <div id="panelOrdenes" class="panel"><div class="search-row"><input id="buscarOrden" placeholder="Buscar orden o material..." oninput="renderOrdenes()"/><span class="small">Busca por orden, material, desviación, origen o status.</span></div><div class="table-wrap"><table id="tablaOrdenes"></table></div></div>
-  <div id="panelConsumo" class="panel"><div class="table-wrap"><table id="tablaConsumo"></table></div></div><div id="panelLlegadas" class="panel"><div class="table-wrap"><table id="tablaLlegadas"></table></div></div><div id="panelCriticos" class="panel"><div class="table-wrap"><table id="tablaCriticos"></table></div></div><div id="panelDesviaciones" class="panel"><div class="table-wrap"><table id="tablaDesviaciones"></table></div></div><div id="panelOpciones" class="panel"><div class="table-wrap"><table id="tablaOpciones"></table></div></div><div id="panelKanban" class="panel"><div class="table-wrap"><table id="tablaKanban"></table></div></div><div id="panelBulk" class="panel"><div class="table-wrap"><table id="tablaBulk"></table></div></div><div id="panelFaltantes" class="panel"><div class="table-wrap"><table id="tablaFaltantes"></table></div></div><div id="panelInventario" class="panel"><div class="search-row"><input id="buscarInv" placeholder="Buscar material..." oninput="renderInventarioFinal()"/></div><div class="table-wrap"><table id="tablaInventario"></table></div></div><div id="panelHistorial" class="panel"><div class="table-wrap"><table id="tablaHistorial"></table></div></div>
+  <div class="topbar-status"><span class="dot"></span>Listo</div>
+</header>
+<div class="container">
+
+  <section class="workflow">
+    <div class="card">
+      <div class="section-head">
+        <h2>Cargar y ejecutar</h2>
+        <p>Órdenes e inventario de la corrida actual</p>
+      </div>
+      <div class="file-grid">
+        <div class="file-box"><label for="pick">SOLO PICK / Órdenes</label><input type="file" id="pick" accept=".xlsx,.xls,.csv"/></div>
+        <div class="file-box"><label for="flor">FLOR</label><input type="file" id="flor" accept=".xlsx,.xls,.csv"/></div>
+        <div class="file-box"><label for="stck">STCK</label><input type="file" id="stck" accept=".xlsx,.xls,.csv"/></div>
+        <div class="file-box"><label for="prog">PROG / Programado</label><input type="file" id="prog" accept=".xlsx,.xls,.csv"/></div>
+        <div class="file-box"><label for="llegadas">LLEGADAS / Material recibido o por llegar (opcional)</label><input type="file" id="llegadas" accept=".xlsx,.xls,.csv"/></div>
+      </div>
+      <div class="run-row">
+        <label class="toggle"><input type="checkbox" id="llegadasToggle"/><span>Incluir llegadas en el análisis</span></label>
+        <div style="display:flex;flex-wrap:wrap;gap:16px">
+          <div class="run-actions">
+            <button class="btn-primary" onclick="ejecutar(false)">Simular</button>
+            <button class="btn-outline" onclick="ejecutar(true)">Optimizar</button>
+          </div>
+          <div class="export-actions">
+            <button class="btn-ghost" onclick="exportarExcel()">Exportar Excel completo</button>
+            <button class="btn-ghost" onclick="exportarPlanProduccion()">Exportar plan</button>
+            <button class="btn-text" onclick="limpiarResultados()">Limpiar</button>
+          </div>
+        </div>
+      </div>
+      <div id="status" class="status-neutral">Esperando archivos...</div>
+      <div class="ok-note"><b>Corrección incluida:</b> Las órdenes <b>COMPLETA SI LLEGA KANBAN</b> ahora reservan/consumen inventario directo para no reutilizar el mismo stock en otras órdenes.</div>
+    </div>
+
+    <div class="card">
+      <button class="accordion-trigger" id="accTrigger" onclick="toggleAcordeon()">
+        <span>Bases fijas <span class="muted">configuración</span></span>
+        <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div id="fixedStatus" class="fixed-status"></div>
+      <div class="accordion-body" id="accBody" hidden>
+        <div class="file-grid">
+          <div class="file-box"><label for="alt">BASE DE DATOS V2 / Material → Alternative Number</label><input type="file" id="alt" accept=".xlsx,.xls,.csv"/></div>
+          <div class="file-box"><label for="ff">QR A FF / Tabla QR → FF</label><input type="file" id="ff" accept=".xlsx,.xls,.csv"/></div>
+          <div class="file-box"><label for="topbase">BASE TOP / Top Level → QRCODE / FFQRCODE</label><input type="file" id="topbase" accept=".xlsx,.xls,.csv"/></div>
+          <div class="file-box"><label for="papas">PAPAS BD / Orden → TOP LEVEL → HIJO</label><input type="file" id="papas" accept=".xlsx,.xls,.csv"/></div>
+          <div class="file-box"><label for="bulk">BULK / Materiales que no bloquean orden</label><input type="file" id="bulk" accept=".xlsx,.xls,.csv"/></div>
+          <div class="file-box"><label for="kanban">KANBAN / Materiales de llegada continua</label><input type="file" id="kanban" accept=".xlsx,.xls,.csv"/></div>
+        </div>
+        <div class="accordion-actions">
+          <button class="btn-outline" onclick="guardarBasesFijas()">Guardar / actualizar bases fijas</button>
+          <button class="btn-danger-outline" onclick="borrarBasesFijas()">Borrar bases fijas</button>
+          <button class="btn-danger-outline" onclick="borrarHistorial()">Borrar historial</button>
+        </div>
+        <div class="warning"><b>Nota:</b> BASE 1SDX, QR→FF, BASE TOP, PAPAS BD, BULK y KANBAN se guardan en este navegador con localStorage.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="metrics">
+    <div class="metric-group">
+      <h3>Órdenes</h3>
+      <div class="metric-row">
+        <div class="metric"><span class="value" id="mTotal">0</span><span class="label">Órdenes</span></div>
+        <div class="metric"><span class="value" id="mOk">0</span><span class="label">Completas</span></div>
+        <div class="metric"><span class="value" id="mKanban">0</span><span class="label">Si llega kanban</span></div>
+        <div class="metric flag"><span class="value" id="mBad">0</span><span class="label">No completas</span></div>
+      </div>
+    </div>
+    <div class="metric-group">
+      <h3>Desviaciones aplicadas</h3>
+      <div class="metric-row">
+        <div class="metric"><span class="value" id="mDirectas">0</span><span class="label">Directas aplicadas</span></div>
+        <div class="metric"><span class="value" id="mFF">0</span><span class="label">FF aplicadas</span></div>
+        <div class="metric"><span class="value" id="mTopPlan">0</span><span class="label">TOP/PLAN aplicadas</span></div>
+        <div class="metric"><span class="value" id="mOpcionesDesv">0</span><span class="label">Opc. desviación</span></div>
+      </div>
+    </div>
+    <div class="metric-group">
+      <h3>Otros</h3>
+      <div class="metric-row">
+        <div class="metric"><span class="value" id="mLlegadasImpacto">0</span><span class="label">Por llegada</span></div>
+        <div class="metric"><span class="value" id="mBulk">0</span><span class="label">Bulk</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="results">
+    <nav class="tabs" id="primaryTabs">
+      <button class="tab active" onclick="mostrarGrupo('resumen',this)">Resumen</button>
+      <button class="tab" onclick="mostrarGrupo('ordenes',this)">Órdenes</button>
+      <button class="tab" onclick="mostrarGrupo('desviaciones',this)">Desviaciones</button>
+      <button class="tab" onclick="mostrarGrupo('faltantes',this)">Faltantes</button>
+      <button class="tab" onclick="mostrarGrupo('inventario',this)">Inventario</button>
+      <button class="tab" onclick="mostrarGrupo('historial',this)">Historial</button>
+    </nav>
+    <nav class="subtabs" id="sub-ordenes" hidden>
+      <button class="subtab active" onclick="mostrarTab('ordenes',this)">Todas</button>
+      <button class="subtab" onclick="mostrarTab('consumo',this)">Consumo por origen</button>
+      <button class="subtab" onclick="mostrarTab('criticos',this)">Críticos</button>
+    </nav>
+    <nav class="subtabs" id="sub-desviaciones" hidden>
+      <button class="subtab active" onclick="mostrarTab('desviaciones',this)">Aplicadas</button>
+      <button class="subtab" onclick="mostrarTab('opciones',this)">Opciones</button>
+    </nav>
+    <nav class="subtabs" id="sub-faltantes" hidden>
+      <button class="subtab active" onclick="mostrarTab('kanban',this)">KANBAN</button>
+      <button class="subtab" onclick="mostrarTab('bulk',this)">Bulk</button>
+      <button class="subtab" onclick="mostrarTab('faltantes',this)">Reales</button>
+    </nav>
+    <nav class="subtabs" id="sub-inventario" hidden>
+      <button class="subtab active" onclick="mostrarTab('inventario',this)">Final</button>
+      <button class="subtab" onclick="mostrarTab('llegadas',this)">Impacto llegadas</button>
+    </nav>
+
+    <div id="panelResumen" class="panel active"><div id="resumenEjecutivo"></div></div>
+    <div id="panelOrdenes" class="panel"><div class="search-row"><input id="buscarOrden" placeholder="Buscar orden o material..." oninput="renderOrdenes()"/><span class="small">Busca por orden, material, desviación, origen o status.</span></div><div class="table-wrap"><table id="tablaOrdenes"></table></div></div>
+    <div id="panelConsumo" class="panel"><div class="table-wrap"><table id="tablaConsumo"></table></div></div>
+    <div id="panelLlegadas" class="panel"><div class="table-wrap"><table id="tablaLlegadas"></table></div></div>
+    <div id="panelCriticos" class="panel"><div class="table-wrap"><table id="tablaCriticos"></table></div></div>
+    <div id="panelDesviaciones" class="panel"><div class="table-wrap"><table id="tablaDesviaciones"></table></div></div>
+    <div id="panelOpciones" class="panel"><div class="table-wrap"><table id="tablaOpciones"></table></div></div>
+    <div id="panelKanban" class="panel"><div class="table-wrap"><table id="tablaKanban"></table></div></div>
+    <div id="panelBulk" class="panel"><div class="table-wrap"><table id="tablaBulk"></table></div></div>
+    <div id="panelFaltantes" class="panel"><div class="table-wrap"><table id="tablaFaltantes"></table></div></div>
+    <div id="panelInventario" class="panel"><div class="search-row"><input id="buscarInv" placeholder="Buscar material..." oninput="renderInventarioFinal()"/></div><div class="table-wrap"><table id="tablaInventario"></table></div></div>
+    <div id="panelHistorial" class="panel"><div class="table-wrap"><table id="tablaHistorial"></table></div></div>
+  </section>
 </div>
 <script>
+
 const LS_ALT="planner_altMap_v2",LS_FF="planner_ffMap_v2",LS_BULK="planner_bulkSet_v1",LS_KANBAN="planner_kanbanSet_v1",LS_HIST="planner_historial_v1",LS_TOP="planner_topBase_v1",LS_PAPAS="planner_papasBD_v1";
 let ordenes={},inventarioInicial={},altMap={},ffMap={},topRows=[],papasByOrder={},bulkSet=new Set(),kanbanSet=new Set();
 let resultadosGlobal=[],desviacionesGlobal=[],opcionesDesviacionGlobal=[],kanbanGlobal=[],bulkGlobal=[],faltantesGlobal=[],impactoLlegadasGlobal=[],impactoLlegadasParcialGlobal=[],llegadasMap={},inventarioFinalGlobal={},materialesOrdenBaseSet=new Set(),materialesUsadosSet=new Set(),consumoGlobal=[],criticosGlobal=[];
-function idFile(id){return document.getElementById(id).files[0]}function setStatus(msg){document.getElementById("status").innerHTML=msg}function normalizarMaterial(v){return(v===undefined||v===null)?"":String(v).trim()}function normalizarKey(v){return normalizarMaterial(v).toUpperCase()}function esBulk(mat){return bulkSet.has(normalizarKey(mat))}function esKanban(mat){return kanbanSet.has(normalizarKey(mat))}function num(v){if(v===undefined||v===null||v==="")return 0;if(typeof v==="number")return v;let n=Number(String(v).replace(/,/g,"").trim());return isNaN(n)?0:n}function cleanCode(v){let s=normalizarMaterial(v);return(!s||s==="-"||/^NO\s/i.test(s))?"":s}
+function idFile(id){return document.getElementById(id).files[0]}function setStatus(msg){const el=document.getElementById("status");el.innerHTML=msg;el.classList.remove("status-success","status-error","status-neutral");if(msg.indexOf("❌")===0)el.classList.add("status-error");else if(msg.indexOf("✅")===0)el.classList.add("status-success");else el.classList.add("status-neutral")}function normalizarMaterial(v){return(v===undefined||v===null)?"":String(v).trim()}function normalizarKey(v){return normalizarMaterial(v).toUpperCase()}function esBulk(mat){return bulkSet.has(normalizarKey(mat))}function esKanban(mat){return kanbanSet.has(normalizarKey(mat))}function num(v){if(v===undefined||v===null||v==="")return 0;if(typeof v==="number")return v;let n=Number(String(v).replace(/,/g,"").trim());return isNaN(n)?0:n}function cleanCode(v){let s=normalizarMaterial(v);return(!s||s==="-"||/^NO\s/i.test(s))?"":s}
 function getVal(row,posibles){for(const p of posibles){if(row[p]!==undefined)return row[p]}const keys=Object.keys(row);for(const p of posibles){const found=keys.find(k=>k.trim().toLowerCase()===p.trim().toLowerCase());if(found)return row[found]}return undefined}function firstValue(row){for(const k of Object.keys(row||{})){const v=normalizarMaterial(row[k]);if(v)return v}return""}
 async function leerExcel(file,opciones={}){if(!file)throw new Error("Falta cargar un archivo.");if(typeof XLSX==="undefined")throw new Error("No se cargó la librería XLSX.");return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=e=>{try{const wb=XLSX.read(new Uint8Array(e.target.result),{type:"array"});let sheetName=wb.SheetNames[0];if(opciones.sheetName){const ex=wb.SheetNames.find(s=>s.trim().toLowerCase()===opciones.sheetName.trim().toLowerCase());if(ex)sheetName=ex}if(opciones.requiredHeaders&&opciones.requiredHeaders.length){for(const s of wb.SheetNames){const j=XLSX.utils.sheet_to_json(wb.Sheets[s],{defval:""});if(j.length){const keys=Object.keys(j[0]).map(k=>k.trim().toLowerCase());if(opciones.requiredHeaders.every(h=>keys.includes(h.trim().toLowerCase()))){sheetName=s;break}}}}resolve(XLSX.utils.sheet_to_json(wb.Sheets[sheetName],{defval:""}))}catch(err){reject(err)}};reader.onerror=reject;reader.readAsArrayBuffer(file)})}
 function loadJSON(key,fallback){try{const raw=localStorage.getItem(key);return raw?JSON.parse(raw):fallback}catch(e){return fallback}}function saveJSON(key,value){localStorage.setItem(key,JSON.stringify(value))}function cargarBasesDesdeStorage(){altMap=loadJSON(LS_ALT,{});ffMap=loadJSON(LS_FF,{});topRows=loadJSON(LS_TOP,[]);papasByOrder=loadJSON(LS_PAPAS,{});bulkSet=new Set(loadJSON(LS_BULK,[]));kanbanSet=new Set(loadJSON(LS_KANBAN,[]));renderFixedStatus()}function renderFixedStatus(){const el=document.getElementById("fixedStatus");if(!el)return;el.innerHTML=`<div class="fixed-chip"><b>BASE 1SDX:</b> ${Object.keys(altMap).length}</div><div class="fixed-chip"><b>QR→FF:</b> ${Object.keys(ffMap).length}</div><div class="fixed-chip"><b>BASE TOP:</b> ${topRows.length}</div><div class="fixed-chip"><b>PAPAS BD:</b> ${Object.keys(papasByOrder).length} órdenes</div><div class="fixed-chip"><b>BULK:</b> ${bulkSet.size}</div><div class="fixed-chip"><b>KANBAN:</b> ${kanbanSet.size}</div>`}
@@ -68,7 +315,12 @@ function renderKanban(){let h=`<tr><th>Orden</th><th>Material KANBAN</th><th>Req
 function renderFaltantes(){let h=`<tr><th>Orden</th><th>Material faltante</th><th>Requerido / Cantidad</th><th>Disponible directo</th><th>Faltante</th><th>Motivo / Opción</th></tr>`;const hayReales=faltantesGlobal.length>0,hayOpciones=desviacionesGlobal.length>0||opcionesDesviacionGlobal.length>0;if(!hayReales&&!hayOpciones)h+=`<tr><td colspan="6" class="small">No hay faltantes reales no KANBAN ni faltantes cubiertos/con opción de desviación.</td></tr>`;faltantesGlobal.forEach(f=>h+=`<tr class="bad-row"><td><b>${f.orden}</b></td><td>${f.material}</td><td>${f.requerido}</td><td>${f.disponibleInicial}</td><td><b>${f.faltante}</b></td><td>${f.motivo}</td></tr>`);desviacionesGlobal.forEach(d=>h+=`<tr class="opcion-row"><td><b>${d.orden}</b></td><td>${d.materialOriginal}</td><td>${d.cantidad}</td><td>0 / insuficiente</td><td><b>${d.cantidad}</b></td><td><span class="badge badge-ok">FALTANTE CUBIERTO</span> usar <b>${d.materialUsado}</b> ${badge(d.tipo)} ${d.topUsado?`| Top:${d.topUsado}`:""} ${d.hijoUsado?`| Hijo:${d.hijoUsado}`:""} | aplicada en orden completa | ${d.regla||""}</td></tr>`);opcionesDesviacionGlobal.forEach(d=>h+=`<tr class="opcion-row"><td><b>${d.orden}</b></td><td>${d.materialOriginal}</td><td>${d.cantidad}</td><td>0 / insuficiente</td><td><b>${d.cantidad}</b></td><td><span class="badge badge-bad">FALTANTE CON OPCIÓN</span> usar <b>${d.materialUsado}</b> ${badge(d.tipo)} ${d.topUsado?`| Top:${d.topUsado}`:""} ${d.hijoUsado?`| Hijo:${d.hijoUsado}`:""} | no aplicada como desviación final | ${d.regla||""}</td></tr>`);document.getElementById("tablaFaltantes").innerHTML=h}
 function renderInventarioFinal(){const q=(document.getElementById("buscarInv")?.value||"").toLowerCase();let h=`<tr><th>Material</th><th>FLOR final</th><th>STCK final</th><th>Llegada final</th><th>PROG</th><th>Llegada agregada</th><th>Disponible final</th><th>Tipo fijo</th></tr>`;Array.from(materialesUsadosSet).sort().forEach(mat=>{if(q&&!mat.toLowerCase().includes(q))return;const d=inventarioFinalGlobal[mat]||{flor:0,stck:0,llegada:0,prog:0};const tipo=esBulk(mat)?badge("BULK"):(esKanban(mat)?badge("KANBAN"):"");h+=`<tr><td><b>${mat}</b></td><td>${num(d.flor)}</td><td>${num(d.stck)}</td><td>${num(d.llegada)}</td><td>${num(d.prog)}</td><td>${llegadasMap[mat]||0}</td><td><b>${disponibleEn(inventarioFinalGlobal,mat)}</b></td><td>${tipo}</td></tr>`});document.getElementById("tablaInventario").innerHTML=h}
 function renderHistorial(){const hist=loadJSON(LS_HIST,[]);let h=`<tr><th>Fecha</th><th>Modo</th><th>Órdenes</th><th>Completas</th><th>Kanban</th><th>No completas</th><th>Por llegada</th><th>Desv. aplicadas</th><th>Opciones</th><th>Bulk</th></tr>`;if(!hist.length)h+=`<tr><td colspan="10" class="small">Sin historial local.</td></tr>`;hist.slice().reverse().forEach(x=>h+=`<tr><td>${x.fecha}</td><td>${x.modo}</td><td>${x.total}</td><td>${x.ok}</td><td>${x.kanban}</td><td>${x.bad}</td><td>${x.llegadas}</td><td>${x.desv}</td><td>${x.opciones||0}</td><td>${x.bulk}</td></tr>`);document.getElementById("tablaHistorial").innerHTML=h}function guardarHistorial(optimizar,usarLlegadas){const hist=loadJSON(LS_HIST,[]);hist.push({fecha:new Date().toLocaleString(),modo:`${optimizar?"Optimizado":"Simulado"}${usarLlegadas?" con llegadas":""}`,total:resultadosGlobal.length,ok:resultadosGlobal.filter(r=>r.status==="COMPLETA").length,kanban:resultadosGlobal.filter(r=>r.status==="COMPLETA SI LLEGA KANBAN").length,bad:resultadosGlobal.filter(r=>r.status==="NO COMPLETA").length,llegadas:impactoLlegadasGlobal.length,desv:desviacionesGlobal.length,opciones:opcionesDesviacionGlobal.length,bulk:bulkGlobal.length});saveJSON(LS_HIST,hist.slice(-50))}
-function mostrarTab(tab,btn){document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));const map={resumen:"panelResumen",ordenes:"panelOrdenes",consumo:"panelConsumo",llegadas:"panelLlegadas",criticos:"panelCriticos",desviaciones:"panelDesviaciones",opciones:"panelOpciones",kanban:"panelKanban",bulk:"panelBulk",faltantes:"panelFaltantes",inventario:"panelInventario",historial:"panelHistorial"};document.getElementById(map[tab]).classList.add("active")}
+function mostrarPanel(id){document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));document.getElementById(id).classList.add("active")}
+const GRUPO_DEFAULT={ordenes:"panelOrdenes",desviaciones:"panelDesviaciones",faltantes:"panelKanban",inventario:"panelInventario"};
+function mostrarGrupo(grupo,btn){document.querySelectorAll("#primaryTabs .tab").forEach(b=>b.classList.remove("active"));btn.classList.add("active");document.querySelectorAll(".subtabs").forEach(s=>{s.hidden=true});if(grupo==="resumen"){mostrarPanel("panelResumen");return}if(grupo==="historial"){mostrarPanel("panelHistorial");return}const sub=document.getElementById("sub-"+grupo);if(sub){sub.hidden=false;sub.querySelectorAll(".subtab").forEach(b=>b.classList.remove("active"));const first=sub.querySelector(".subtab");if(first)first.classList.add("active")}mostrarPanel(GRUPO_DEFAULT[grupo])}
+function mostrarTab(tab,btn){const map={resumen:"panelResumen",ordenes:"panelOrdenes",consumo:"panelConsumo",llegadas:"panelLlegadas",criticos:"panelCriticos",desviaciones:"panelDesviaciones",opciones:"panelOpciones",kanban:"panelKanban",bulk:"panelBulk",faltantes:"panelFaltantes",inventario:"panelInventario",historial:"panelHistorial"};if(btn){btn.parentElement.querySelectorAll(".subtab").forEach(b=>b.classList.remove("active"));btn.classList.add("active")}mostrarPanel(map[tab])}
+function ejecutar(optimizar){const conLlegadas=document.getElementById("llegadasToggle").checked;cargarDatosYSimular(optimizar,conLlegadas)}
+function toggleAcordeon(){const body=document.getElementById("accBody");const trig=document.getElementById("accTrigger");const isHidden=body.hasAttribute("hidden");if(isHidden){body.removeAttribute("hidden");trig.classList.add("open")}else{body.setAttribute("hidden","");trig.classList.remove("open")}}
 function exportarExcel(){if(!resultadosGlobal.length){alert("Primero corre una simulación u optimización.");return}const resumen=resultadosGlobal.map((r,i)=>({Secuencia:i+1,Orden:r.orden,Status:r.status,Semaforo:r.semaforo,TipoDesviacion:r.tipoDesviacion,LineasMaterial:r.detalle.length,FaltantesReales:r.faltantes.length,FaltantesKanban:r.kanban.length,BulksIgnorados:r.bulkIgnorados.length}));const detalle=[];resultadosGlobal.forEach((r,i)=>{r.detalle.forEach(d=>detalle.push({Secuencia:i+1,Orden:r.orden,Status:r.status,Semaforo:r.semaforo,Aplicacion:estadoAplicacion(r.status),TipoDesviacionOrden:r.tipoDesviacion,MaterialOriginal:d.material,MaterialUsado:d.usado,Tipo:d.tipo,Origen:d.origen,Cantidad:d.cantidad,TopOriginal:d.topOriginal||"",TopUsadoFabricado:d.topUsado||d.topFabricado||"",HijoUsado:d.hijoUsado||"",Via:d.via||"",ReglaAplicada:d.regla||"",AlternativeOriginal:altMap[d.material]||"",AlternativeUsado:altMap[d.usado]||""}));r.faltantes.forEach(f=>detalle.push({Secuencia:i+1,Orden:r.orden,Status:r.status,Semaforo:r.semaforo,Tipo:"FALTANTE REAL",MaterialOriginal:f.material,Cantidad:f.requerido,Faltante:f.faltante}));r.kanban.forEach(f=>detalle.push({Secuencia:i+1,Orden:r.orden,Status:r.status,Semaforo:r.semaforo,Tipo:"KANBAN FALTANTE",MaterialOriginal:f.material,Cantidad:f.requerido,Faltante:f.faltante}))});const llegadas=Object.keys(llegadasMap).map(m=>({Material:m,CantidadLlegada:llegadasMap[m]}));const desviaciones=desviacionesGlobal.map(d=>({EstadoUso:"APLICADA",Orden:d.orden,MaterialOriginal:d.materialOriginal,MaterialUsado:d.materialUsado,Tipo:d.tipo,Origen:d.origen,Cantidad:d.cantidad,TopOriginal:d.topOriginal,TopUsadoFabricado:d.topUsado,HijoUsado:d.hijoUsado,Via:d.via,ReglaAplicada:d.regla,AlternativeOriginal:d.altOriginal,AlternativeUsado:d.altUsado}));const opciones=opcionesDesviacionGlobal.map(d=>({EstadoUso:"OPCIÓN NO APLICADA",Orden:d.orden,StatusOrden:d.statusOrden,MaterialOriginal:d.materialOriginal,MaterialUsado:d.materialUsado,Tipo:d.tipo,Origen:d.origen,Cantidad:d.cantidad,TopOriginal:d.topOriginal,TopUsadoFabricado:d.topUsado,HijoUsado:d.hijoUsado,Via:d.via,ReglaAplicada:d.regla,AlternativeOriginal:d.altOriginal,AlternativeUsado:d.altUsado}));const kanban=kanbanGlobal.map(f=>({Orden:f.orden,Material:f.material,Requerido:f.requerido,DisponibleDirecto:f.disponibleInicial,Faltante:f.faltante,Status:"COMPLETA SI LLEGA KANBAN"}));const bulk=bulkGlobal.map(b=>({Orden:b.orden,Material:b.material,Requerido:b.requerido,FaltanteIgnorado:b.faltante,Regla:"BULK NO BLOQUEA"}));const faltantes=faltantesGlobal.map(f=>({Orden:f.orden,Material:f.material,Requerido:f.requerido,DisponibleDirecto:f.disponibleInicial,Faltante:f.faltante,Motivo:f.motivo,OpcionDesviacion:""})).concat(desviacionesGlobal.map(d=>({Orden:d.orden,Material:d.materialOriginal,Requerido:d.cantidad,DisponibleDirecto:"0 / insuficiente",Faltante:d.cantidad,Motivo:"FALTANTE CUBIERTO CON DESVIACION APLICADA",OpcionDesviacion:`Usar ${d.materialUsado} (${d.tipo})`,TopUsadoFabricado:d.topUsado,HijoUsado:d.hijoUsado,ReglaAplicada:d.regla,AlternativeOriginal:d.altOriginal,AlternativeUsado:d.altUsado}))).concat(opcionesDesviacionGlobal.map(d=>({Orden:d.orden,Material:d.materialOriginal,Requerido:d.cantidad,DisponibleDirecto:"0 / insuficiente",Faltante:d.cantidad,Motivo:"FALTANTE CON OPCION NO APLICADA",OpcionDesviacion:`Usar ${d.materialUsado} (${d.tipo})`,TopUsadoFabricado:d.topUsado,HijoUsado:d.hijoUsado,ReglaAplicada:d.regla,AlternativeOriginal:d.altOriginal,AlternativeUsado:d.altUsado})));const inventario=Array.from(materialesUsadosSet).sort().map(mat=>{const d=inventarioFinalGlobal[mat]||{flor:0,stck:0,llegada:0,prog:0};return{Material:mat,FLOR_Final:num(d.flor),STCK_Final:num(d.stck),Llegada_Final:num(d.llegada),PROG:num(d.prog),Llegada_Agregada:llegadasMap[mat]||0,Disponible_Final:disponibleEn(inventarioFinalGlobal,mat),EsBulk:esBulk(mat)?"SI":"NO",EsKanban:esKanban(mat)?"SI":"NO"}});const wb=XLSX.utils.book_new();[["Resumen",resumen],["Detalle",detalle],["Consumo Origen",consumoGlobal],["Llegadas",llegadas],["Impacto Llegadas",impactoLlegadasGlobal],["Ayuda Parcial",impactoLlegadasParcialGlobal],["Criticos",criticosGlobal],["Desv Aplicadas",desviaciones],["Opciones Desv",opciones],["Kanban",kanban],["Bulk",bulk],["Faltantes Reales",faltantes],["Inventario Final",inventario],["Historial",loadJSON(LS_HIST,[])]].forEach(([n,d])=>XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(d),n));XLSX.writeFile(wb,"resultado_planeador_1SDX.xlsx")}
 function exportarPlanProduccion(){if(!resultadosGlobal.length){alert("Primero corre una simulación u optimización.");return}const plan=resultadosGlobal.filter(r=>r.status==="COMPLETA"||r.status==="COMPLETA SI LLEGA KANBAN").map((r,i)=>({Secuencia:i+1,Orden:r.orden,Status:r.status,Semaforo:r.semaforo,TipoDesviacion:r.tipoDesviacion,Comentario:r.status==="COMPLETA"?"Programable":"Programable condicionado a KANBAN; inventario directo reservado"}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(plan),"Plan Produccion");XLSX.writeFile(wb,"plan_produccion_programable.xlsx")}
 function limpiarResultados(){resultadosGlobal=[];desviacionesGlobal=[];opcionesDesviacionGlobal=[];kanbanGlobal=[];bulkGlobal=[];faltantesGlobal=[];impactoLlegadasGlobal=[];impactoLlegadasParcialGlobal=[];llegadasMap={};inventarioFinalGlobal={};materialesUsadosSet=new Set();consumoGlobal=[];criticosGlobal=[];["mTotal","mOk","mKanban","mBad","mLlegadasImpacto","mDirectas","mFF","mTopPlan","mOpcionesDesv","mBulk"].forEach(id=>document.getElementById(id).innerText="0");["tablaOrdenes","tablaConsumo","tablaLlegadas","tablaCriticos","tablaDesviaciones","tablaOpciones","tablaKanban","tablaBulk","tablaFaltantes","tablaInventario"].forEach(id=>document.getElementById(id).innerHTML="");document.getElementById("resumenEjecutivo").innerHTML="";setStatus("Resultados limpiados. Puedes cargar o correr de nuevo.")}window.addEventListener("load",()=>{cargarBasesDesdeStorage();renderHistorial();setStatus("Listo. Si ya guardaste bases fijas, carga SOLO PICK / FLOR / STCK / PROG. Para analizar llegadas, carga también LLEGADAS.")});
