@@ -403,7 +403,7 @@ function colorTipo(t){return COLORES_TIPO[t]||"#9ca3af"}
 function pintarLeyenda(elId,mapa){const total=Object.values(mapa).reduce((a,b)=>a+b,0);const el=document.getElementById(elId);if(!el)return;if(!total){el.innerHTML='<span class="small">Sin datos todavía.</span>';return}el.innerHTML=Object.keys(mapa).map(k=>{const pct=Math.round(mapa[k]/total*100);return `<span><i style="background:${colorTipo(k)}"></i>${k}: ${mapa[k]} (${pct}%)</span>`}).join("")}
 function renderMetricas(){
   const totalLlegada=Object.values(llegadasMap).reduce((a,b)=>a+num(b),0);
-  const usadoLlegada=consumoGlobal.filter(c=>c.origen==="LLEGADA").reduce((a,c)=>a+num(c.cantidad),0);
+  const usadoLlegada=consumoGlobal.filter(c=>c.origen==="LLEGADA"&&c.status!=="NO COMPLETA").reduce((a,c)=>a+num(c.cantidad),0);
   const pctUso=totalLlegada>0?Math.round(usadoLlegada/totalLlegada*100):0;
   document.getElementById("pctLlegadaUso").innerText=pctUso+"%";
   document.getElementById("barLlegadaUso").style.width=Math.min(100,pctUso)+"%";
