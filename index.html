@@ -92,7 +92,7 @@ button{font-family:var(--font-sans);cursor:pointer;border-radius:var(--radius);f
 .chart-card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-top:16px}
 .chart-card h3{font-size:13px;font-weight:700;margin:0 0 14px}
 .chart-box{position:relative;height:230px}
-.chart-box-wide{height:460px}
+.chart-box-wide{height:560px}
 .chart-box canvas{width:100%!important;height:100%!important}
 .chart-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;font-size:12px;color:var(--muted)}
 .chart-legend span{display:flex;align-items:center;gap:5px}
@@ -316,6 +316,7 @@ td b{font-family:var(--font-mono);font-weight:600}
         <div class="metric"><span class="value" id="ordenesParcialLlegada">0</span><span class="label">Órdenes con ayuda parcial</span></div>
       </div>
       <div class="progress-track"><div class="progress-fill" id="barLlegadaUso" style="width:0%"></div></div>
+      <p class="small" id="detalleLlegadaUso" style="margin-top:8px"></p>
 
       <div class="section-head" style="margin-top:28px"><h2>Desviaciones por tipo</h2><p>Qué tipo de desviación completa órdenes vs. qué tipo solo queda como opción</p></div>
       <div class="charts-row">
@@ -409,6 +410,11 @@ function renderMetricas(){
   document.getElementById("barLlegadaUso").style.width=Math.min(100,pctUso)+"%";
   document.getElementById("ordenesCompletanLlegada").innerText=impactoLlegadasGlobal.length;
   document.getElementById("ordenesParcialLlegada").innerText=impactoLlegadasParcialGlobal.length;
+  const ordenesCompletanSet=new Set(impactoLlegadasGlobal.map(x=>x.orden));
+  const ordenesParcialSet=new Set(impactoLlegadasParcialGlobal.map(x=>x.orden));
+  const usadoCompletanQty=consumoGlobal.filter(c=>c.origen==="LLEGADA"&&ordenesCompletanSet.has(c.orden)).reduce((a,c)=>a+num(c.cantidad),0);
+  const usadoParcialQty=consumoGlobal.filter(c=>c.origen==="LLEGADA"&&ordenesParcialSet.has(c.orden)).reduce((a,c)=>a+num(c.cantidad),0);
+  document.getElementById("detalleLlegadaUso").innerHTML=`Usados que completan órdenes: <b>${usadoCompletanQty}/${totalLlegada}</b> &nbsp;·&nbsp; Usados que ayudan parcial: <b>${usadoParcialQty}/${totalLlegada}</b>`;
   const tiposCompletan=contarPorTipo(desviacionesGlobal);
   const tiposNoCompletan=contarPorTipo(opcionesDesviacionGlobal);
   pintarLeyenda("legendCompletan",tiposCompletan);
@@ -422,14 +428,15 @@ function renderMetricas(){
   const dlOptions=typeof ChartDataLabels!=="undefined"?{datalabels:{color:"#fff",font:{weight:"bold",size:12},formatter:function(value,ctx){const t=ctx.dataset.data.reduce((a,b)=>a+b,0);const p=t>0?Math.round(value/t*100):0;return value>0?value+" ("+p+"%)":""}}}:{};
   if(chartCompletanRef)chartCompletanRef.destroy();
   const ctxA=document.getElementById("chartCompletan");
-  if(ctxA)chartCompletanRef=new Chart(ctxA,{type:"doughnut",plugins:dlPlugins,data:{labels:Object.keys(tiposCompletan),datasets:[{data:Object.values(tiposCompletan),backgroundColor:Object.keys(tiposCompletan).map(colorTipo)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:tooltipPct}},...dlOptions}}});
+  if(ctxA)chartCompletanRef=new Chart(ctxA,{type:"doughnut",plugins:dlPlugins,data:{labels:Object.keys(tiposCompletan),datasets:[{data:Object.values(tiposCompletan),backgroundColor:Object.keys(tiposCompletan).map(colorTipo)}]},options:{responsive:true,maintainAspectRatio:false,devicePixelRatio:window.devicePixelRatio||2,plugins:{legend:{display:false},tooltip:{callbacks:{label:tooltipPct}},...dlOptions}}});
   if(chartNoCompletanRef)chartNoCompletanRef.destroy();
   const ctxB=document.getElementById("chartNoCompletan");
-  if(ctxB)chartNoCompletanRef=new Chart(ctxB,{type:"doughnut",plugins:dlPlugins,data:{labels:Object.keys(tiposNoCompletan),datasets:[{data:Object.values(tiposNoCompletan),backgroundColor:Object.keys(tiposNoCompletan).map(colorTipo)}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:tooltipPct}},...dlOptions}}});
+  if(ctxB)chartNoCompletanRef=new Chart(ctxB,{type:"doughnut",plugins:dlPlugins,data:{labels:Object.keys(tiposNoCompletan),datasets:[{data:Object.values(tiposNoCompletan),backgroundColor:Object.keys(tiposNoCompletan).map(colorTipo)}]},options:{responsive:true,maintainAspectRatio:false,devicePixelRatio:window.devicePixelRatio||2,plugins:{legend:{display:false},tooltip:{callbacks:{label:tooltipPct}},...dlOptions}}});
   const top20=criticosGlobal.slice(0,20);
   if(chartTopMaterialesRef)chartTopMaterialesRef.destroy();
   const ctxC=document.getElementById("chartTopMateriales");
-  if(ctxC)chartTopMaterialesRef=new Chart(ctxC,{type:"bar",data:{labels:top20.map(x=>x.material),datasets:[{data:top20.map(x=>x.veces),backgroundColor:"#ff000f",borderRadius:3}]},options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return "Órdenes afectadas: "+ctx.parsed.x},afterLabel:function(ctx){const d=top20[ctx.dataIndex].descripcion;return d?"Descripción: "+d:""}}}},scales:{x:{ticks:{precision:0}},y:{ticks:{font:{family:"ui-monospace,Consolas,monospace",size:11}}}}}});
+  const truncar=(s,n)=>s&&s.length>n?s.substring(0,n)+"…":(s||"");
+  if(ctxC)chartTopMaterialesRef=new Chart(ctxC,{type:"bar",plugins:dlPlugins,data:{labels:top20.map(x=>x.descripcion?[x.material,truncar(x.descripcion,32)]:[x.material]),datasets:[{data:top20.map(x=>x.veces),backgroundColor:"#ff000f",borderRadius:3}]},options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,devicePixelRatio:window.devicePixelRatio||2,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return "Órdenes afectadas: "+ctx.parsed.x},afterLabel:function(ctx){const d=top20[ctx.dataIndex].descripcion;return d?"Descripción: "+d:""}}},...(typeof ChartDataLabels!=="undefined"?{datalabels:{color:"#0a0a0a",anchor:"end",align:"end",font:{weight:"bold",size:11},formatter:function(value){return value}}}:{})},scales:{x:{ticks:{precision:0}},y:{ticks:{font:{family:"ui-monospace,Consolas,monospace",size:11}}}}}});
 
   const noCompletas=resultadosGlobal.filter(r=>r.status==="NO COMPLETA");
   const buckets=["1","2","3","4","5+"];
@@ -437,7 +444,7 @@ function renderMetricas(){
   noCompletas.forEach(r=>{const n=r.faltantes.length;const k=n>=5?"5+":String(n);distFaltantes[k]=(distFaltantes[k]||0)+1});
   if(chartDistFaltantesRef)chartDistFaltantesRef.destroy();
   const ctxD=document.getElementById("chartDistFaltantes");
-  if(ctxD)chartDistFaltantesRef=new Chart(ctxD,{type:"bar",data:{labels:buckets.map(b=>b+(b==="1"?" material":" materiales")),datasets:[{data:buckets.map(b=>distFaltantes[b]||0),backgroundColor:buckets.map(b=>(b==="1"||b==="2")?"#ff000f":"#5f5f5c"),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.parsed.y+" orden(es)"}}}},scales:{y:{ticks:{precision:0}}}}});
+  if(ctxD)chartDistFaltantesRef=new Chart(ctxD,{type:"bar",data:{labels:buckets.map(b=>b+(b==="1"?" material":" materiales")),datasets:[{data:buckets.map(b=>distFaltantes[b]||0),backgroundColor:buckets.map(b=>(b==="1"||b==="2")?"#ff000f":"#5f5f5c"),borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,devicePixelRatio:window.devicePixelRatio||2,plugins:{legend:{display:false},tooltip:{callbacks:{label:function(ctx){return ctx.parsed.y+" orden(es)"}}}},scales:{y:{ticks:{precision:0}}}}});
 }function guardarHistorial(optimizar,usarLlegadas){const hist=loadJSON(LS_HIST,[]);hist.push({fecha:new Date().toLocaleString(),modo:`${optimizar?"Optimizado":"Simulado"}${usarLlegadas?" con llegadas":""}`,total:resultadosGlobal.length,ok:resultadosGlobal.filter(r=>r.status==="COMPLETA").length,kanban:resultadosGlobal.filter(r=>r.status==="COMPLETA SI LLEGA KANBAN").length,bad:resultadosGlobal.filter(r=>r.status==="NO COMPLETA").length,llegadas:impactoLlegadasGlobal.length,desv:desviacionesGlobal.length,opciones:opcionesDesviacionGlobal.length,bulk:bulkGlobal.length});saveJSON(LS_HIST,hist.slice(-50))}
 function mostrarPanel(id){document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));document.getElementById(id).classList.add("active")}
 const GRUPO_DEFAULT={ordenes:"panelOrdenes",desviaciones:"panelDesviaciones",faltantes:"panelKanban",inventario:"panelInventario"};
